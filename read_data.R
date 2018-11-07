@@ -35,5 +35,13 @@ dt.master <- merge(merge(merge(dt.prcbreaches_final, dt.catorgs_final, by = c("c
                    dt.categories_final, by = c("cat_id"), all = TRUE),
                    dt.orgsindex_final, by = c("org_id"), all = TRUE)
 
+# Entity type
+# BSO - business other
+# BSF - business - financial and insurance services
+# BSR - business - retail and merchant
+# EDU - education institutions
+# GOV - government and military
+# MED - healthcare - medical providersr
+# NGO - nonprofit organizations
 
 
