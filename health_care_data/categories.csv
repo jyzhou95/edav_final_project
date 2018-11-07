@@ -1,0 +1,55 @@
+CatID,CatName,Coordinates,Hover
+1,Prescription Analytics,"492,358,617,381","Prescription Analytics are companies that use prescriptions to develop data products (e.g., marketing sales reports). Ex. IMS Health."
+2,Pharmaceutical Company,"554,433,704,463","Pharmaceutical Companies develop, produce, and markets drugs and pharmaceuticals for use as medication. Ex. Merck, Pfizer."
+3,Pharmacy,"516,181,573,208","Pharmacies include local stores charged with ensuring the safe and effective use and sale of pharmaceutical drugs. Ex. CVS, Rite-Aid, Walmart."
+4,Pharmacy Benefits Manager,"391,236,553,258","Pharmacy Benefits Managers are companies hired by health payers to be responsible for approving, processing and paying prescription drug claims."
+5,Clearing House,"312,61,398,85","Clearing Houses are companies hired by physicians and healthcare providers to process and manage payment issues with health payers. Ex. Navicure, Office Ally, ZirMed."
+6,Life Insurance Company,"7,7,143,27","Life Insurance Companies provide a lump-sum payment to beneficiaries upon your death in exchange for regularly paid payments (premiums) by you while you are alive. Ex. MetLife, Prudential."
+7,Vital Statistics,"627,347,706,368","Vital Statistics offices at the local, regional or state level register births, marriages, divorces and deaths."
+8,Transcription,"645,231,718,252",Transcription services transcribe voice recordings of reports from physicians and healthcare providers into written text. Many are off-shored (e.g. in India).
+9,Coding,"673,273,712,295","Coding services help healthcare providers with billing by completing insurance claim forms with diagnoses (e.g., ICD-9 codes) and procedures codes."
+10,ICU Management,"615,27,713,48",ICU Management software integrates data from various critical care instruments in intensive care units. Software improvements require sharing ICU data with vendors. Ex. Philips.
+11,Employer's Wellness Program,"54,492,222,515","Employer\'s Wellness Programs are operated by companies hired by an employer to help improve the health of employees deemed to be at risk for illness and prod them to change their behavior (e.g. stop smoking, lose weight)."
+13,"You, the Patient","308,6,416,32","You, the Patient are the source of your personal health information. Not every person is in every data sharing arrangement shown, but each arrow denotes a known sharing arrangement for some person\'s data."
+14,Medical Devices,"154,412,245,433","Medical Devices include personal medical devices (e.g., pace makers, walkers, glucometers) and medical equipment (e.g., mammography machine, X-ray machines)."
+15,Employer,"4,146,56,173","Employers (Yours, Spouse\'s) decide on the health plan options made available to employees and usually contribute a significant portion of the payment for each employee."
+16,Consulting Physician,"331,184,448,205","Consulting Physicians are usually qualified specialists that make a diagnosis, treatment plan, or prognosis about your disease."
+17,Payer (Insurer),"159,184,252,214","Health Payers (Insurers) are entities other than you that pay for the cost of your health services. There are many options, including insurance companies, healthcare organizations, the government, and even employers."
+18,"Physician, Hospital","489,13,610,42","Providers (Physicians, Hospitals, Dentists, Eye Care providers) provide preventive, curative or rehabilitative health care services in a systematic way to individuals, families or communities."
+19,Accreditation,"642,91,717,111","Accreditation organizations review providers and facilities to make sure they operate within the industry\'s best practices. Ex. Joint Commission, NCQA."
+21,De-identification,"402,52,494,71",De-identification services offer advice on how to redact patient data so that it is sufficiently de-identified and may certify the results. Ex. Privacert.
+22,Law Firms,"652,161,710,184","Law Firms involved in lawsuits may obtain your personal health information, especially in medical malpractice lawsuits, even if you are not a complaining patient."
+23,Public Health,"589,265,661,285","Public Health agencies at the local, regional, or state level require healthcare providers and clinical labs to report certain patient information whenever cases of specific diseases or measurements occur. Ex. HIV, cancer, lead poisioning."
+24,Clinical Lab,"328,152,394,170","Clinical or medical laboratories conduct tests on your body specimens to get information about your health pertaining to diagnosis, treatment or the prevention of a disease."
+25,Analytics,"277,446,327,474","Analytic companies or consultants use methods to explore, investigate, and locate patterns within collections of personal information in order to provide strategic insights or produce data or marketing products."
+26,Disease Management,"55,257,179,279","Disease Management companies coordinate healthcare and communications between stakeholders in cases where patient self-care efforts are significant. Ex. Aetna Health Management, CIGNA Health Support."
+27,Personal Health Record,"3,424,140,446","Personal Health Record companies allow individuals to deposit, retrieve and share personal health information. Ex. Microsoft Health Vault, Dossier, Health Record Bank Alliance."
+28,Discharge Data,"375,282,475,313","Discharge Data (State, Hospital Consortium) is a statewide collection of information on each hospital or physician office visit and includes your demographics, diagnoses, procedures, costs and payment information."
+29,Researcher,"253,361,316,386","Researchers engage a full spectrum of data affecting all aspects of personal and social life, business practices, and policy assessments."
+30,CDC,"634,394,661,414",The Centers for Disease Control and Prevention (CDC) is a federal agency that operates as the national public health institute in the United States.
+31,Online Websites,"3,304,95,326","Online Websites allow many possible opportunities for you to share your personal information publicly or among large groups. Ex. Discussion forums, Personal Genome Project, 23andMe, Facebook."
+33,Employee Union,"17,187,109,212","Employee Unions legally represent workers in many industries in the United States in issues involving wages, benefits and working conditions. Ex. SEIU (includes healthcare workers)."
+34,Health IT,"430,371,480,393","Health IT companies provide information technology for the use, management and exchange of health information within and across computerized systems, including for provider or for personal use. Ex. 3M, GE."
+35,Other Government,"521,508,626,531","Other Government agencies include but are not limited to the FDA, motor vehicle registries, regional planning and development offices and professional licensing boards."
+36,Federal Trade Commission,"268,502,420,525","The Federal Trade Commission or FTC is the national consumer protection agency in the United States and collects complaints about companies, practices and identity theft."
+37,Financial,"140,341,224,364","Financial Firms include financial market institutions, but also organizations providing personal loans, mortgages, credit cards and other personal financial services."
+38,Media,"374,467,409,492","Media refers to outlets intended to reach large audiences through mass communications. Ex. television, newspapers, heavily trafficked online blogs."
+39,Real Estate,"417,484,515,506","Real Estate Firms provide advice and marketing and related services to the real estate industry, websites, and specific sales of land-related property."
+40,Blood & Tissue,"7,37,92,56","Blood and Tissue companies (for or non-profit) are involved in collecting and/or distributing blood and tissue such as blood banks, the American Red Cross, and groups affiliated with organ transplant programs. "
+41,Retirement & Disability,"3,67,127,88",Retirement & Disability companies include workers compensation and non-union retirement benefits organizations plans. 
+42,Human Resources,"20,108,123,128",Human Resources are third party companies hired by employers to assist or facilitate the services of an HR department for their employees. 
+43,SSA,"11,230,39,253","The Social Security Administration (SSA) is the independent agency of the Federal Government that administers Social Security (a program consisting of retirement, disability, and survivors\' benefits)."
+44,Personal Transport,"146,53,252,74","Personal Transport companies transport patients and include helicopter (MedEvac), ambulance, or Safe Ride."
+45,Mental & Addiction,"144,97,221,116",Mental & Addiction organizations are public and private mental health and substance abuse facilities.
+46,Dental and Vision,"142,141,215,163","Dental and Vision are dentist and optometrist practices, differentiated from Providers since they are usually not covered by health insurance."
+47,Home Health,"243,111,315,131",Home Health organizations and workers treat the patient at their home. 
+48,Care Facility,"429,101,497,124","Care facilities include retirement homes, skilled nursing facilities, hospice, live-in rehabilitation and other non-hospital overnight healthcare facilities."
+49,Debt Collection,"630,58,714,76",Debt collection agencies are business that pursue payments of debts owed by individuals or businesses.
+50,Law & Justice,"638,125,717,147","Law and Justice includes law enforcement, the judiciary, and other organizations related to enforcing the laws and trying and housing those who break them."
+51,Social Services,"515,141,599,162","Social Services are local, state or federal government public services including healthcare, public housing, youth, family and senior programs and assistance for people with disabilities."
+52,Education,"435,155,492,177","Education includes childcare, primary, secondary and college educational institutions."
+53,Copy&Transport,"627,198,718,220","Copy & Transport companies are specialized medical document transportation, copying, digitizing firms as well as traditional delivery services like FedEx or USPS when they are transporting medical documents. "
+54,Registries,"571,221,627,242",Registries are organizations that track and compile lists of people with particular medical conditions and donor registries.
+55,Associations,"646,307,716,329",Professional Associations seek to further a particular profession and represent the interest of the professional practitioners. Ex. American Medical Association.
+56,Licensing,"664,375,717,397","Licensing organizations provide licensing for an activity or job, often granted through a professional body or board. Ex. FAA"
+57,Social Support,"91,380,175,402","Social Support organizations are private groups that focus on a range of issues including children’s health, family planning, wellness and veteran affairs. "
