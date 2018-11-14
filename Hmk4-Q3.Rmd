@@ -1,0 +1,37 @@
+---
+title: "Hmk4-Q3"
+author: "Michelle Chen"
+date: "November 14, 2018"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r echo= FALSE}
+knitr::opts_chunk$set(error = TRUE)
+
+library(data.table)
+library(glue)
+library(tidyverse)
+
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+parent_dir <- getwd()
+dt.master <-fread(glue("{parent_dir}/health_care_data/master.csv"))
+```
+
+
+## R Markdown
+
+
+```{r}
+cat_records_breached <- dt.master %>% filter(records_breached <1000000& !is.na(records_breached)) %>% select(records_breached, cat_name)
+ggplot(data = cat_records_breached,aes(x = reorder(cat_name,records_breached,FUN =median), y =records_breached)) + geom_boxplot() + coord_flip() + ggtitle("Distribution of Records Breached Across Category/Industry") + ylab("# Records Breached") + xlab("")
+
+state_records_breached <-dt.master %>%filter(!is.na(records_breached) & records_breached <100000) %>% select(state, records_breached)
+ggplot(data = state_records_breached,aes(x = reorder(state,records_breached,FUN =median), y =records_breached)) + geom_boxplot() + coord_flip() + ggtitle("Distribution of Records Breached Across States") + ylab("# Records Breached") + xlab("")
+
+region_records_breached <-dt.master %>%filter(!is.na(records_breached) & records_breached <50000 & region!="" & region!="Puerto Rico") %>% select(region, records_breached, state)
+ggplot(data = region_records_breached,aes(x = reorder(region,records_breached,FUN =median), y =records_breached)) + geom_boxplot() + coord_flip() + ggtitle("Distribution of Records Breached Across Region") + ylab("# Records Breached") + xlab("")
+```
+
+**Insights:** For the first chart (Distribution of Records Breached Across Category/Industry), we can see that Debt Collection, Pharmacy Benefits, Blood & Tissue, Clearing House, and Clinical Lab have the highest number of records breached when sorted by median number of records. Other categories in this chart experience potential outliers since they fall outside the hinge boundaries and these points are something we need to examine in later stages of exploratory data analysis. For the second chart, we faceted # records breached by the state in which the breach occured. Hawaii, Iowa, DC, West VA, and Georgia come out as the top 5 when sorted by median. However, other categories experience even more elongated right whiskers which may allude to higher quantities of records breached per breach. In particular, GA and AZ also stand out as having very long range of values. There are also a number of lingering points to the right that we may need to further examine to see if they are outliers. For the 3rd chart, we faceted it by region. When sorted by median # of records breached, there does not seem to be a huge discrepancy in the distribution of number of records breached based on region. However, it does seem like each region experiences many potential outliers. 
