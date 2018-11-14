@@ -7,16 +7,12 @@ output:
     df_print: paged
 ---
 
-```{r echo= FALSE}
-knitr::opts_chunk$set(error = TRUE)
-
+```{r}
 library(data.table)
 library(glue)
 library(tidyverse)
 
-setwd(dirname(rstudioapi::getSourceEditorContext()$path))
-parent_dir <- getwd()
-dt.master <-fread(glue("{parent_dir}/health_care_data/master.csv"))
+dt.master <-fread("health_care_data/master.csv")
 ```
 
 
