@@ -1,9 +1,9 @@
 library(data.table)
 
-dt.categories <- fread("~/GitHub/edav_final_project/health_care_data/categories.csv")
-dt.catorgs <- fread("~/GitHub/edav_final_project/health_care_data/catsorgs.csv")
-dt.orgsindex <- fread("~/GitHub/edav_final_project/health_care_data/orgsindex.csv")
-dt.prcbreaches <- fread("~/GitHub/edav_final_project/health_care_data/prcbreaches2005-18.csv")
+dt.categories <- fread("health_care_data/categories.csv")
+dt.catorgs <- fread("health_care_data/catsorgs.csv")
+dt.orgsindex <- fread("health_care_data/orgsindex.csv")
+dt.prcbreaches <- fread("health_care_data/prcbreaches2005-18.csv")
 
 dt.categories_final <- dt.categories[,list(cat_id = CatID, 
                                      cat_name = CatName)]
