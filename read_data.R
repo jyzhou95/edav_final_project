@@ -36,9 +36,13 @@ dt.prcbreaches_final <- dt.prcbreaches[,list(records_breached = Records.Breached
                                        breach_source = Source.of.Breach.Notification, 
                                        breach_type = Type)]
 
-dt.master <- merge(merge(merge(dt.prcbreaches_final, dt.catorgs_final, by = c("cat_id", "org_id"), all = TRUE),
-                   dt.categories_final, by = c("cat_id"), all = TRUE),
-                   dt.orgsindex_final, by = c("org_id"), all = TRUE)
+dt.orgsindex_final <- unique(dt.orgsindex_final, by = c("org_id"))
+
+dt.master <- merge(merge(merge(dt.prcbreaches_final, dt.catorgs_final, by = c("cat_id", "org_id"), all.x = TRUE),
+                   dt.categories_final, by = c("cat_id"), all.x = TRUE),
+                   dt.orgsindex_final, by = c("org_id"), all.x = TRUE)
+
+dt.master
 
 # Entity type
 # BSO - business other
