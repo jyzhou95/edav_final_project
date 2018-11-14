@@ -1,9 +1,14 @@
 library(data.table)
+library(glue)
 
-dt.categories <- fread("health_care_data/categories.csv")
-dt.catorgs <- fread("health_care_data/catsorgs.csv")
-dt.orgsindex <- fread("health_care_data/orgsindex.csv")
-dt.prcbreaches <- fread("health_care_data/prcbreaches2005-18.csv")
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+parent_dir <- getwd()
+
+
+dt.categories <- fread(glue("{parent_dir}/health_care_data/categories.csv"))
+dt.catorgs <- fread(glue("{parent_dir}/health_care_data/catsorgs.csv"))
+dt.orgsindex <- fread(glue("{parent_dir}/health_care_data/orgsindex.csv"))
+dt.prcbreaches <- fread(glue("{parent_dir}/health_care_data/prcbreaches2005-18.csv"))
 
 dt.categories_final <- dt.categories[,list(cat_id = CatID, 
                                      cat_name = CatName)]
