@@ -4,7 +4,6 @@ library(glue)
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 parent_dir <- getwd()
 
-
 dt.categories <- fread(glue("{parent_dir}/health_care_data/categories.csv"))
 dt.catorgs <- fread(glue("{parent_dir}/health_care_data/catsorgs.csv"))
 dt.orgsindex <- fread(glue("{parent_dir}/health_care_data/orgsindex.csv"))
