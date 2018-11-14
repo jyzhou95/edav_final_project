@@ -41,8 +41,26 @@ dt.master <- merge(merge(merge(dt.prcbreaches_final, dt.catorgs_final, by = c("c
                    dt.categories_final, by = c("cat_id"), all.x = TRUE),
                    dt.orgsindex_final, by = c("org_id"), all.x = TRUE)
 
-dt.master
+# Fix region
+dt.region <- unique(dt.master[!is.na(region)][,list(region, state)])
 
+# Merge it backc on
+dt.master[,region := NULL]
+dt.master <- merge(dt.master, dt.region, by = c("state"), all.x = TRUE)
+
+# Add unique identifier to each breach
+dt.master$breach_id <- 1:nrow(dt.master)
+
+dt.date_format1 <- dt.master[grepl("\\-", dt)]
+dt.date_format1$dt <- as.Date(dt.date_format1$dt, format = "%d-%b-%y")
+
+dt.date_format2 <- dt.master[grepl("\\/", dt)]
+dt.date_format2$dt <- as.Date(dt.date_format2$dt, format = "%m/%d/%Y")
+
+dt.final <- rbind(dt.date_format1,
+                  dt.date_format2)
+
+write.csv(dt.final, glue("{parent_dir}/health_care_data/master.csv"))
 # Entity type
 # BSO - business other
 # BSF - business - financial and insurance services
