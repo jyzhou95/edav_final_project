@@ -22,9 +22,9 @@ dt.month[,month := month(dt)]
 
 ggplot(dt.month, aes(x = year, y = N)) + geom_point() + theme_bw(base_size = 15) + xlab("Date") + ylab("Number of breach instances") + ggtitle("Number of data breaches from 2005 until 2018") + facet_wrap(~month)
 
-
-
 ggplot(dt.month, aes(x = month, y = N)) + geom_point() + theme_bw(base_size = 15) + xlab("Date") + ylab("Number of breach instances") + ggtitle("Number of data breaches from 2005 until 2018") + facet_wrap(~year)
+
+
 
 # Filter rows without state
 library(choroplethr)
