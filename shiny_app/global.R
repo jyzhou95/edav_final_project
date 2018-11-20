@@ -5,7 +5,12 @@ library(lubridate)
 library(plotly)
 library(choroplethr)
 
-dt.data <- fread("~/GitHub/edav_final_project/health_care_data/master.csv")
+
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+parent_dir <- getwd()
+setwd("..")
+parent_dir <- getwd()
+dt.data <- fread(paste0(parent_dir, "/health_care_data/master.csv"))
 
 
 
