@@ -4,7 +4,11 @@ ui <- shinyUI(
     headerPanel("Breach Data Analysis"),
     mainPanel(
       tabsetPanel(type = "tabs",
-                  tabPanel("Overview"),
+                  tabPanel("Overview",
+                           fluidRow(
+                             h2("Project description"),
+                             column(9, textOutput("projectDescription"))
+                           )),
                   tabPanel("Breach occurences",
                            fluidRow(
                              column(9, plotOutput("industryBreach", width = 900, height = 600))

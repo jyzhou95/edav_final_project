@@ -1,6 +1,18 @@
 library(shiny)
 
 server <- function(input, output, session) {
+  output$projectDescription <- renderText({
+    chr.description <- "In light of recent data breaches to major organizations such as Facebook and Equifax, 
+                        companies are beginning to take extra precautions to protect their data. 
+                        Data breaches are not only costly to recuperate from, but also hurt businesses and 
+                        consumers in the long-run. This movement sparks great discussion about the types of 
+                        companies that are typically targeted, when breaches occur, how the breaches are 
+                        broadcasted to the public, and just how much of our data is at stake. 
+                        Using United States data breaches information from 2005 to 2018, our group hopes to craft
+                        a comprehensive story centered on these breaches and help the public better understand 
+                        why they are happening through meaningful visualizations and interactivity."
+    return (chr.description)
+  })
   
   output$industryBreach <- renderPlot({
     cat_records_breached <- dt.data %>% filter(records_breached <1000000& !is.na(records_breached)) %>% select(records_breached, cat_name)
