@@ -45,7 +45,7 @@ ggplot(data = counts2[1:10,], aes(x=reorder(category,-Freq), y = Freq))+
   geom_bar(stat = "identity") + xlab("Category") + 
   ylab("Occurences of Breaches") + 
   ggtitle("How Often Breaches Occur to Specific Categories") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + theme_bw(base_size = 15)
 
 counts2
 

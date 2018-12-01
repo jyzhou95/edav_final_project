@@ -14,24 +14,86 @@ server <- function(input, output, session) {
     return (chr.description)
   })
   
-  output$industryBreach <- renderPlot({
-    cat_records_breached <- dt.data %>% filter(records_breached <1000000& !is.na(records_breached)) %>% select(records_breached, cat_name)
-    ggplot(data = cat_records_breached,aes(x = reorder(cat_name,records_breached,FUN =median), y =records_breached)) + 
-      geom_boxplot() + coord_flip() + theme_bw() +
-      ggtitle("Distribution of Records Breached Across Category/Industry") + 
-      ylab("# Records Breached") + xlab("") + scale_y_continuous(labels = scales::comma)
+  output$rawData <- renderDataTable({
+    return (dt.data)
+  })
+  
+  output$industryBreach <- renderPlotly({
+    # Filtered by
+    # Have actual records breach data
+    # Number of instances for each category must be at least 5
+    # Remove outlier
+    dt.data_temp <- dt.data[!is.na(records_breached)]
+    cat_records_breached <- dt.data_temp[,list(records_breached, cat_name)]
     
+    # Count numbers of categories
+    dt.cat_count <- cat_records_breached[,.N, by = list(cat_name)]
+    dt.cat_count <- dt.cat_count[N >= 5]
+    
+    cat_records_breached <- cat_records_breached[cat_name %in% dt.cat_count$cat_name]
+    vec_cat <- cat_records_breached[,list(med = median(records_breached)), by = list(cat_name)][order(med)]$cat_name
+    
+    cat_records_breached$cat_name <- factor(x = cat_records_breached$cat_name, levels = vec_cat)
+      
+    dt.click_event_industry_breach <- data.table(event_data("plotly_click"))
+    
+    print(dt.click_event_industry_breach)
+    
+    if (nrow(dt.click_event_industry_breach)){
+      chr.industry <- rev(vec_cat)[unique(dt.click_event_industry_breach$y)]
+      dt.plot.this <- dt.data_temp[cat_name == chr.industry][,list(breach_type, records_breached)]
+      dt.plot.this <- dt.plot.this[,list(records_breached = sum(records_breached)), by = list(breach_type)]
+      dt.plot.this$breach_type <- factor(x = dt.plot.this$breach_type,
+                                         levels = dt.plot.this[order(records_breached, decreasing = TRUE)]$breach_type)
+      plt <- ggplot(dt.plot.this, aes(x = breach_type, y = records_breached)) + 
+        geom_bar(stat = "identity", fill = "lightblue") + theme_bw(base_size = 15) + 
+        ggtitle(paste0("Total Records Breached for ", chr.industry, " by Breach Type")) + 
+        xlab("Breach Type") + ylab("Total Records Breached") + scale_y_log10()
+        
+      
+    } else{
+      plt <- ggplot(data = cat_records_breached[records_breached < 100000],aes(x = cat_name, y =records_breached)) + 
+        geom_boxplot(fill = "lightblue") + 
+        ggtitle("Distribution of Records Breached Across Category/Industry") + 
+        ylab("# Records Breached") + xlab("") + scale_y_continuous(labels = scales::comma) + 
+        theme_bw(base_size = 15) + coord_flip()
+    }
+    ggplotly(plt)
   })
   
   output$annualBreaches <- renderPlotly({
     dt.time_series <- dt.data[,list(dt, breach_id)]
     dt.time_series <- dt.time_series[order(dt)]
     
-    dt.year <- dt.time_series[,.N, by = year(dt)]
-    dt.year[,year := as.Date(paste0(year, "-01-01"))]
-    
-    dt.plot <- ggplot(dt.year, aes(x = year, y = N)) + geom_bar(stat = "identity", fill = "lightblue") + theme_bw(base_size = 15) + xlab("Date") + ylab("Number of breach instances") + ggtitle("Number of data breaches from 2005 until 2018") + scale_x_date(date_breaks = "2 years")
+    if (input$quarterly){
+      dt.quarterly <- dt.time_series
+      dt.quarterly[,quarter := ifelse(month(dt) %in% c(1:3), "q1",
+                                      ifelse(month(dt) %in% c(4:6), "q2",
+                                             ifelse(month(dt) %in% c(7:9), "q3", "q4")))]
+      dt.quarterly[,year := year(dt)]
+      dt.plot.this <- dt.quarterly[,.N, by = list(quarter, year)]
+      
+      dt.plot <- ggplot(dt.plot.this, aes(x = year, y = N)) + 
+        geom_bar(stat = "identity", fill = "lightblue") + 
+        theme_bw(base_size = 15) + 
+        xlab("Year") + ylab("Number of breach instances") + 
+        ggtitle("Number of data breaches from 2005 until 2018") +
+        facet_wrap(~quarter)
+      
+      
+    } else{
+      dt.year <- dt.time_series[,.N, by = year(dt)]
+      dt.year[,year := as.Date(paste0(year, "-01-01"))]
+      
+      dt.plot <- ggplot(dt.year, aes(x = year, y = N)) + 
+                  geom_bar(stat = "identity", fill = "lightblue") + 
+                  theme_bw(base_size = 15) + 
+                  xlab("Date") + ylab("Number of breach instances") + 
+                  ggtitle("Number of data breaches from 2005 until 2018") +
+                  scale_x_date(date_breaks = "1 year", date_labels = "%Y")
+    }
     ggplotly(dt.plot)
+    
   })
   
   output$breachMap <- renderPlot({

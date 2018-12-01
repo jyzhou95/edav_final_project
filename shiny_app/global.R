@@ -11,6 +11,6 @@ parent_dir <- getwd()
 setwd("..")
 parent_dir <- getwd()
 dt.data <- fread(paste0(parent_dir, "/health_care_data/master.csv"))
-
+dt.data[,dt := as.Date(dt, format = "%m/%d/%Y")]
 
 
