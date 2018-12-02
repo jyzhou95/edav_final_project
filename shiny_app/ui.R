@@ -37,6 +37,13 @@ ui <- shinyUI(
                            fluidRow(
                              column(9, plotlyOutput("annualBreaches", width = 900, height = 600))
                            ),
+                           
+                           fluidRow(
+                             column(9, checkboxInput(inputId = "normalizePopulation",
+                                                     label = "Normalize by population: ",
+                                                     value = FALSE))
+                           ),
+                           
                            fluidRow(
                              column(9, plotOutput("breachMap", width = 900, height = 600))
                            )

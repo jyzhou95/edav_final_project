@@ -97,17 +97,32 @@ server <- function(input, output, session) {
   })
   
   output$breachMap <- renderPlot({
-    dt.states <- dt.data[nchar(state) > 2][,list(dt, state, breach_id)]
-    dt.map <- dt.states[,.N, by = state]
-    dt.map <- dt.map[state %in% state.name]
-    dt.map$state <- tolower(dt.map$state)
-    # Add DC
-    dt.map <- rbind(dt.map,
-                    data.table(state = "district of columbia",
-                               N = 0))
-    colnames(dt.map) <- c("region", "value")
-    state_choropleth(data.frame(dt.map),
-                     "Number of data breach instances from 2005 to 2018")
+    if (input$normalizePopulation){
+      # State population data
+      dt.state_population <- data.table(state.x77)[,list(State = V1, Population)]
+      dt.state_population$State <- tolower(dt.state_population$State)
+      dt.state_population$Population <- dt.state_population$Population * 1000
+      dt.states <- dt.data[nchar(state) > 2][,list(dt, state, breach_id)]
+      dt.map <- dt.states[,.N, by = state]
+      dt.map <- dt.map[state %in% state.name]
+      dt.map$state <- tolower(dt.map$state)
+      dt.merged_data <- merge(dt.states, dt.map, by = c("state"))
+      ggplot(dt.merged_data, aes(x = Population, y = N)) + geom_point() + 
+        xlab("State Population") + ylab("Number of Breach Instance") + theme_+bw(base_size = 12)
+      
+    } else{
+      dt.states <- dt.data[nchar(state) > 2][,list(dt, state, breach_id)]
+      dt.map <- dt.states[,.N, by = state]
+      dt.map <- dt.map[state %in% state.name]
+      dt.map$state <- tolower(dt.map$state)
+      # Add DC
+      dt.map <- rbind(dt.map,
+                      data.table(state = "district of columbia",
+                                 N = 0))
+      colnames(dt.map) <- c("region", "value")
+      state_choropleth(data.frame(dt.map),
+                       "Number of data breach instances from 2005 to 2018")
+    }
   })
   
   
