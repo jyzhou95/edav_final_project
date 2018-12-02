@@ -37,8 +37,6 @@ server <- function(input, output, session) {
       
     dt.click_event_industry_breach <- data.table(event_data("plotly_click"))
     
-    print(dt.click_event_industry_breach)
-    
     if (nrow(dt.click_event_industry_breach)){
       chr.industry <- rev(vec_cat)[unique(dt.click_event_industry_breach$y)]
       dt.plot.this <- dt.data_temp[cat_name == chr.industry][,list(breach_type, records_breached)]
@@ -108,7 +106,7 @@ server <- function(input, output, session) {
       dt.map$state <- tolower(dt.map$state)
       dt.merged_data <- merge(dt.states, dt.map, by = c("state"))
       ggplot(dt.merged_data, aes(x = Population, y = N)) + geom_point() + 
-        xlab("State Population") + ylab("Number of Breach Instance") + theme_+bw(base_size = 12)
+        xlab("State Population") + ylab("Number of Breach Instance") + theme_bw(base_size = 12)
       
     } else{
       dt.states <- dt.data[nchar(state) > 2][,list(dt, state, breach_id)]
