@@ -6,7 +6,6 @@ library(plotly)
 library(ggthemes)
 library(viridis)
 library(extracat)
-library(mi)
 
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 setwd("..")

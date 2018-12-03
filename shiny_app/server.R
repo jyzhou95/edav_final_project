@@ -144,11 +144,6 @@ server <- function(input, output, session) {
   output$missingData <- renderPlot({
     visna(dt.data, sort = "r")
   })
-  
-  output$missingDataHeat <- renderPlot({
-    x<-missing_data.frame(dt.master)
-    image(x)
-  })
-  
+
 }
   

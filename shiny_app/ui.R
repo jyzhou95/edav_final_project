@@ -55,9 +55,9 @@ ui <- shinyUI(
                              column(9, plotOutput("missingData", width = 900, height = 600))
                            ),
                            br(),
-                           fluidRow(
-                             column(9, plotOutput("missingDataHeat", width = 900, height = 600))
-                           )
+                           
+                           tags$img(src='missing_data.jpeg', width = "900px", height = "600px")
+                           
                            )
       )
     )
