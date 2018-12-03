@@ -104,37 +104,18 @@ server <- function(input, output, session) {
     
   })
   
-  # output$breachMap <- renderPlotly({
-  #     dt.states <- dt.data[nchar(state) > 2][,list(dt, state, breach_id)]
-  #     dt.map <- dt.states[,.N, by = state]
-  #     dt.map <- dt.map[state %in% state.name]
-  #     
-  #     colnames(dt.map) <- c("state", "breach_instance")
-  #     dt.map[,category:="state"]
-  #     dt.map <- dt.map[order(state)]
-  #     dt.map[,code := state.abb]
-  #     dt.map[,hover := paste0("State: ", state)]
-  #     
-  #     g <- list(
-  #       scope = 'usa',
-  #       projection = list(type = 'albers usa'),
-  #       showlakes = TRUE,
-  #       lakecolor = toRGB('white')
-  #     )
-  #     
-  #     p <- plot_geo(data.frame(dt.map), locationmode = 'USA-states') %>%
-  #       add_trace(
-  #         z = ~breach_instance, text = ~hover, locations = ~code,
-  #         color = ~breach_instance, colors = viridis_pal(option = "D")(3)
-  #       ) %>%
-  #       colorbar(title = "Breach Instance") %>%
-  #       layout(
-  #         title = 'Number of data breach instances from 2005 to 2018',
-  #         geo = g
-  #       )
-  #     
-  #     p
-  # })
+  output$breachState <- renderPlot({
+      dt.states <- dt.data[nchar(state) > 2][,list(dt, state, breach_id)]
+      dt.map <- dt.states[,.N, by = state]
+      dt.map <- dt.map[state %in% state.name]
+      colnames(dt.map) <- c("state", "breach_instance")
+      dt.map$state <- factor(dt.map$state,levels = dt.map[order(breach_instance, decreasing = TRUE)]$state)
+      dt.map <- dt.map[order(breach_instance, decreasing = TRUE)]
+      ggplot(head(dt.map, 5), aes(x = state, y = breach_instance)) + geom_bar(stat = "identity") + 
+        theme_bw(base_size = 15) +
+        xlab("State") + ylab("Breach Instance")
+      
+  })
   
   output$breachScatterPlot <- renderPlotly({
     # State population data
@@ -160,7 +141,14 @@ server <- function(input, output, session) {
     }
   })
   
+  output$missingData <- renderPlot({
+    visna(dt.data, sort = "r")
+  })
   
+  output$missingDataHeat <- renderPlot({
+    x<-missing_data.frame(dt.master)
+    image(x)
+  })
   
 }
   

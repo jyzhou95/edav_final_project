@@ -41,16 +41,23 @@ ui <- shinyUI(
                            br(),
                            br(),
                            
-                           # fluidRow(
-                           #   column(9, plotlyOutput("breachMap", width = 900, height = 600))
-                           # ),
+                           fluidRow(
+                             column(9, plotOutput("breachState", width = 900, height = 600))
+                           ),
                            
                            
                            fluidRow(
                              column(9, plotlyOutput("breachScatterPlot", width = 900, height = 600))
                            )
                   ),
-                  tabPanel("Data Quality Exploration"
+                  tabPanel("Data Quality Exploration",
+                           fluidRow(
+                             column(9, plotOutput("missingData", width = 900, height = 600))
+                           ),
+                           br(),
+                           fluidRow(
+                             column(9, plotOutput("missingDataHeat", width = 900, height = 600))
+                           )
                            )
       )
     )
