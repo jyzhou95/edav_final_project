@@ -22,7 +22,7 @@ ui <- shinyUI(
                            fluidRow(
                              column(9, dataTableOutput("rawData"))
                            )),
-                  tabPanel("Breach occurences",
+                  tabPanel("Breach over various industries",
                              fluidRow(
                                column(9, plotlyOutput("industryBreach", width = 900, height = 600))
                              )
@@ -35,20 +35,26 @@ ui <- shinyUI(
                                                      value = FALSE))
                            ),
                            fluidRow(
-                             column(9, plotlyOutput("annualBreaches", width = 900, height = 600))
-                           ),
-                           
-                           br(),
-                           br(),
-                           
+                             column(9, plotOutput("annualBreaches", width = 900, height = 600))
+                           )
+                  ),
+                  tabPanel("Breaches over different region",
                            fluidRow(
                              column(9, plotOutput("breachState", width = 900, height = 600))
                            ),
                            
+                           br(),
                            
                            fluidRow(
                              column(9, plotlyOutput("breachScatterPlot", width = 900, height = 600))
+                           ),
+                           
+                           br(),
+                           
+                           fluidRow(
+                             column(9, plotOutput("breachBoxplotState", width = 900, height = 600))
                            )
+                           
                   ),
                   tabPanel("Data Quality Exploration",
                            fluidRow(

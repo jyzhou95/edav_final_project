@@ -63,13 +63,13 @@ server <- function(input, output, session) {
       plt <- ggplot(data = cat_records_breached[records_breached < 100000],aes(x = cat_name, y =records_breached)) + 
         geom_boxplot(fill = "lightblue") + 
         ggtitle("Distribution of Records Breached Across Category/Industry") + 
-        ylab("# Records Breached") + xlab("") + scale_y_continuous(labels = scales::comma) + 
+        ylab("Number of records breached") + xlab("") + scale_y_continuous(labels = scales::comma) + 
         theme_bw(base_size = 15) + coord_flip()
       ggplotly(plt, source = "industryBreach")
     }
   })
   
-  output$annualBreaches <- renderPlotly({
+  output$annualBreaches <- renderPlot({
     dt.time_series <- dt.data[,list(dt, breach_id)]
     dt.time_series <- dt.time_series[order(dt)]
     
@@ -100,20 +100,29 @@ server <- function(input, output, session) {
                   ggtitle("Number of data breaches from 2005 until 2018") +
                   scale_x_date(date_breaks = "1 year", date_labels = "%Y")
     }
-    ggplotly(dt.plot)
+    dt.plot
     
   })
   
   output$breachState <- renderPlot({
-      dt.states <- dt.data[nchar(state) > 2][,list(dt, state, breach_id)]
-      dt.map <- dt.states[,.N, by = state]
+      dt.states <- dt.data[nchar(state) > 2][,list(dt, state, breach_id, breach_type_name)]
+      
+      dt.map <- dt.states[,.N, by = list(state, breach_type_name)]
       dt.map <- dt.map[state %in% state.name]
-      colnames(dt.map) <- c("state", "breach_instance")
-      dt.map$state <- factor(dt.map$state,levels = dt.map[order(breach_instance, decreasing = TRUE)]$state)
-      dt.map <- dt.map[order(breach_instance, decreasing = TRUE)]
-      ggplot(head(dt.map, 5), aes(x = state, y = breach_instance)) + geom_bar(stat = "identity") + 
+      colnames(dt.map) <- c("state", "breach_type_name", "breach_instance")
+      
+      dt.map_total <- dt.states[,.N, by = list(state)]
+      dt.map_total <- dt.map_total[state %in% state.name]
+      colnames(dt.map_total) <- c("state", "breach_instance")
+      
+      dt.map$state <- factor(dt.map$state,levels = dt.map_total[order(breach_instance, decreasing = TRUE)]$state)
+      
+      dt.map <- dt.map[state %in% head(dt.map_total[order(breach_instance, decreasing = TRUE)]$state, 5)]
+      
+      ggplot(dt.map, aes(x = state, y = breach_instance, fill = breach_type_name)) + 
+        geom_bar(stat = "identity", position = "dodge") + 
         theme_bw(base_size = 15) +
-        xlab("State") + ylab("Breach Instance")
+        xlab("State") + ylab("Breach Instance") + scale_fill_colorblind()
       
   })
   
@@ -128,6 +137,35 @@ server <- function(input, output, session) {
     dt.click_event_breach_scatter <- data.table(event_data("plotly_click", source = "breachScatterPlot"))
     
     if (nrow(dt.click_event_breach_scatter)){
+      if (dt.click_event_breach_scatter$y%%1==0){
+        chr.state <- dt.merged_data$state[dt.click_event_breach_scatter$pointNumber + 1]
+        dt.data_temp <- dt.data[state == chr.state & !is.na(records_breached)][,list(category,
+                                                                                     records_breached)]
+        
+        dt.data_temp <- dt.data_temp[,list(records_breached = sum(records_breached)), by = list(category)]
+        
+        dt.data_temp$category <- factor(dt.data_temp$category, levels = dt.data_temp[order(records_breached, decreasing = TRUE)]$category)
+        
+        plt <- ggplot(dt.data_temp, aes(x = category, y = records_breached,
+                                        text = paste0("Category: ", category,
+                                                      "\nRecords Breached: ", records_breached))) +
+          geom_bar(stat = "identity", position = "dodge", fill = "lightblue") + 
+          xlab("Category") + ylab("Number of records breached") +
+          theme_bw(base_size = 15) + scale_y_log10() + 
+          ggtitle(glue("Number of records breached by category for {chr.state}")) + 
+          theme(axis.text.x = element_text(angle = 90, hjust = 1))
+        
+        ggplotly(plt, tooltip = c("text"), source = "breachScatterPlot")
+      } else{
+        plt <- ggplot(dt.merged_data, aes(x = population, y = N, 
+                                          text = paste0("State: ", state,
+                                                        "\nState population: ", population,
+                                                        "\nNumber of Breach Instance: ", N))) + geom_point() + 
+          xlab("State Population (in millions)") + ylab("Number of Breach Instance") + theme_bw(base_size = 15) +
+          ggtitle("Number of breach instances vs State Population")
+        
+        ggplotly(plt, tooltip = c("text"), source = "breachScatterPlot")
+      }
       
     } else{
       plt <- ggplot(dt.merged_data, aes(x = population, y = N, 
@@ -139,6 +177,17 @@ server <- function(input, output, session) {
       
       ggplotly(plt, tooltip = c("text"), source = "breachScatterPlot")
     }
+  })
+  
+  output$breachBoxplotState <- renderPlot({
+    dt.states <- dt.data[nchar(state) > 2][,list(dt, state, records_breached)]
+    dt.states <- dt.states[!is.na(records_breached)]
+    ggplot(data = dt.states[records_breached < 100000],
+           aes(x = reorder(state,records_breached,FUN =median), y =records_breached)) + geom_boxplot() + 
+      coord_flip() + ggtitle("Distribution of Records Breached Across States") + 
+      ylab("Number of Records Breached") + xlab("") + theme_bw(base_size = 15)
+    
+
   })
   
   output$missingData <- renderPlot({
