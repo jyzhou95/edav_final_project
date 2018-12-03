@@ -6,6 +6,7 @@ library(plotly)
 library(choroplethr)
 library(rvest)
 library(ggthemes)
+library(viridis)
 
 
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))

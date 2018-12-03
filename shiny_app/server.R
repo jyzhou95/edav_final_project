@@ -125,7 +125,7 @@ server <- function(input, output, session) {
       p <- plot_geo(data.frame(dt.map), locationmode = 'USA-states') %>%
         add_trace(
           z = ~breach_instance, text = ~hover, locations = ~code,
-          color = ~breach_instance, colors = 'Purples'
+          color = ~breach_instance, colors = viridis_pal(option = "D")(3)
         ) %>%
         colorbar(title = "Breach Instance") %>%
         layout(
