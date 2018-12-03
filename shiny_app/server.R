@@ -148,7 +148,7 @@ server <- function(input, output, session) {
         
         plt <- ggplot(dt.data_temp, aes(x = category, y = records_breached,
                                         text = paste0("Category: ", category,
-                                                      "\nRecords Breached: ", records_breached))) +
+                                                      "\nRecords Breached: ", prettyNum(records_breached, scientific=FALSE, big.mark=",")))) +
           geom_bar(stat = "identity", position = "dodge", fill = "lightblue") + 
           xlab("Category") + ylab("Number of records breached") +
           theme_bw(base_size = 15) + scale_y_log10() + 
