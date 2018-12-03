@@ -50,7 +50,7 @@ ui <- shinyUI(
                              column(9, plotlyOutput("breachScatterPlot", width = 900, height = 600))
                            )
                   ),
-                  tabPanel("Data Quality Exploration",
+                  tabPanel("Data Quality Exploration"
                            )
       )
     )

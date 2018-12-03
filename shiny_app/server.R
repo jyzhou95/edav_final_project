@@ -35,19 +35,29 @@ server <- function(input, output, session) {
     
     cat_records_breached$cat_name <- factor(x = cat_records_breached$cat_name, levels = vec_cat)
       
-    dt.click_event_industry_breach <- data.table(event_data("plotly_click"))
-    
-    if (nrow(dt.click_event_industry_breach)){
+    dt.click_event_industry_breach <- data.table(event_data("plotly_click", source = "industryBreach"))
+
+    if (nrow(dt.click_event_industry_breach) > 1){
       chr.industry <- rev(vec_cat)[unique(dt.click_event_industry_breach$y)]
-      dt.plot.this <- dt.data_temp[cat_name == chr.industry][,list(breach_type, records_breached)]
-      dt.plot.this <- dt.plot.this[,list(records_breached = sum(records_breached)), by = list(breach_type)]
+      dt.plot.this <- dt.data_temp[cat_name == chr.industry][,list(breach_type, breach_type_name, records_breached)]
+      dt.plot.this <- dt.plot.this[,list(records_breached = sum(records_breached)), by = list(breach_type, breach_type_name)]
       dt.plot.this$breach_type <- factor(x = dt.plot.this$breach_type,
                                          levels = dt.plot.this[order(records_breached, decreasing = TRUE)]$breach_type)
-      plt <- ggplot(dt.plot.this, aes(x = breach_type, y = records_breached)) + 
-        geom_bar(stat = "identity", fill = "lightblue") + theme_bw(base_size = 15) + 
+      dt.plot.this$breach_type_name <- factor(x = dt.plot.this$breach_type_name,
+                                         levels = dt.plot.this[order(records_breached, decreasing = TRUE)]$breach_type_name)
+      
+      # If the proportion of largest to smallest breach type instances is greater than 100, then use log scales
+      plt <- ggplot(dt.plot.this, aes(x = breach_type, 
+                                      y = records_breached, 
+                                      fill = breach_type_name,
+                                      text = paste0("Breach type name: ", breach_type_name,
+                                                    "\nRecords Breached: ", prettyNum(records_breached, scientific=FALSE, big.mark=",")))) + 
+        geom_bar(stat = "identity") + theme_bw(base_size = 15) + 
         ggtitle(paste0("Total Records Breached for ", chr.industry, " by Breach Type")) + 
-        xlab("Breach Type") + ylab("Total Records Breached") + scale_y_log10()
-        
+        xlab("Breach Type") + ylab("Total Records Breached") + scale_fill_colorblind() + scale_y_log10()
+      
+      ggplotly(plt, source = "industryBreach", tooltip = c("text"))
+      
       
     } else{
       plt <- ggplot(data = cat_records_breached[records_breached < 100000],aes(x = cat_name, y =records_breached)) + 
@@ -55,8 +65,8 @@ server <- function(input, output, session) {
         ggtitle("Distribution of Records Breached Across Category/Industry") + 
         ylab("# Records Breached") + xlab("") + scale_y_continuous(labels = scales::comma) + 
         theme_bw(base_size = 15) + coord_flip()
+      ggplotly(plt, source = "industryBreach")
     }
-    ggplotly(plt)
   })
   
   output$annualBreaches <- renderPlotly({
@@ -75,7 +85,7 @@ server <- function(input, output, session) {
         geom_bar(stat = "identity", fill = "lightblue") + 
         theme_bw(base_size = 15) + 
         xlab("Year") + ylab("Number of breach instances") + 
-        ggtitle("Number of data breaches from 2005 until 2018") +
+        ggtitle("Number of data breaches from 2005 until 2018 Facetted by Quarters") +
         facet_wrap(~quarter)
       
       
@@ -134,14 +144,20 @@ server <- function(input, output, session) {
     dt.merged_data <- merge(dt.state_population, dt.map, by = c("state"))
     dt.merged_data[,population := population / 1000000]
     
-    plt <- ggplot(dt.merged_data, aes(x = population, y = N, 
-                                      text = paste0("State: ", state,
-                                                    "\nState population: ", population,
-                                                    "\nNumber of Breach Instance: ", N))) + geom_point() + 
-      xlab("State Population (in millions)") + ylab("Number of Breach Instance") + theme_bw(base_size = 15) +
-      ggtitle("Number of breach instances vs State Population")
+    dt.click_event_breach_scatter <- data.table(event_data("plotly_click", source = "breachScatterPlot"))
     
-    ggplotly(plt, tooltip = c("text"))
+    if (nrow(dt.click_event_breach_scatter)){
+      
+    } else{
+      plt <- ggplot(dt.merged_data, aes(x = population, y = N, 
+                                        text = paste0("State: ", state,
+                                                      "\nState population: ", population,
+                                                      "\nNumber of Breach Instance: ", N))) + geom_point() + 
+        xlab("State Population (in millions)") + ylab("Number of Breach Instance") + theme_bw(base_size = 15) +
+        ggtitle("Number of breach instances vs State Population")
+      
+      ggplotly(plt, tooltip = c("text"), source = "breachScatterPlot")
+    }
   })
   
   
