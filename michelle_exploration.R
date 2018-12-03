@@ -22,7 +22,7 @@ region_records_breached <-dt.master %>%filter(!is.na(records_breached) & records
 ggplot(data = region_records_breached,aes(x = reorder(region,records_breached,FUN =median), y =records_breached)) + geom_boxplot() + coord_flip() + ggtitle("Distribution of Records Breached Across Region") + ylab("# Records Breached") + xlab("")
 
 ###################
-#Missing Data #####
+###Missing Data ####
 ###################
 install.packages("mi")
 library(mi)
@@ -31,6 +31,18 @@ image(x)
 
 library(extracat)
 visna(dt.master, sort = "r")
+
+
+###################
+###BreachSource####
+###################
+
+b_source<- dt.master %>% select(breach_source) %>% group_by(breach_source)%>%summarize(Freq = n())
+
+ggplot(data = b_source,aes(x=reorder(breach_source, Freq), y = Freq)) + geom_col() + coord_flip() + ggtitle("Frequency of Source of Breaches") + 
+  ylab("Frequency of Breach Source") + xlab("") 
+
+
 ###################
 #Yimin Exploration#
 ###################
