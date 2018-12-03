@@ -41,9 +41,9 @@ ui <- shinyUI(
                            br(),
                            br(),
                            
-                           fluidRow(
-                             column(9, plotlyOutput("breachMap", width = 900, height = 600))
-                           ),
+                           # fluidRow(
+                           #   column(9, plotlyOutput("breachMap", width = 900, height = 600))
+                           # ),
                            
                            
                            fluidRow(

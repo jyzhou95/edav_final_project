@@ -85,7 +85,7 @@ server <- function(input, output, session) {
         geom_bar(stat = "identity", fill = "lightblue") + 
         theme_bw(base_size = 15) + 
         xlab("Year") + ylab("Number of breach instances") + 
-        ggtitle("Number of data breaches from 2005 until 2018 Facetted by Quarters") +
+        ggtitle("Number of data breaches from 2005 until 2018") +
         facet_wrap(~quarter)
       
       
@@ -104,37 +104,37 @@ server <- function(input, output, session) {
     
   })
   
-  output$breachMap <- renderPlotly({
-      dt.states <- dt.data[nchar(state) > 2][,list(dt, state, breach_id)]
-      dt.map <- dt.states[,.N, by = state]
-      dt.map <- dt.map[state %in% state.name]
-      
-      colnames(dt.map) <- c("state", "breach_instance")
-      dt.map[,category:="state"]
-      dt.map <- dt.map[order(state)]
-      dt.map[,code := state.abb]
-      dt.map[,hover := paste0("State: ", state)]
-      
-      g <- list(
-        scope = 'usa',
-        projection = list(type = 'albers usa'),
-        showlakes = TRUE,
-        lakecolor = toRGB('white')
-      )
-      
-      p <- plot_geo(data.frame(dt.map), locationmode = 'USA-states') %>%
-        add_trace(
-          z = ~breach_instance, text = ~hover, locations = ~code,
-          color = ~breach_instance, colors = viridis_pal(option = "D")(3)
-        ) %>%
-        colorbar(title = "Breach Instance") %>%
-        layout(
-          title = 'Number of data breach instances from 2005 to 2018',
-          geo = g
-        )
-      
-      p
-  })
+  # output$breachMap <- renderPlotly({
+  #     dt.states <- dt.data[nchar(state) > 2][,list(dt, state, breach_id)]
+  #     dt.map <- dt.states[,.N, by = state]
+  #     dt.map <- dt.map[state %in% state.name]
+  #     
+  #     colnames(dt.map) <- c("state", "breach_instance")
+  #     dt.map[,category:="state"]
+  #     dt.map <- dt.map[order(state)]
+  #     dt.map[,code := state.abb]
+  #     dt.map[,hover := paste0("State: ", state)]
+  #     
+  #     g <- list(
+  #       scope = 'usa',
+  #       projection = list(type = 'albers usa'),
+  #       showlakes = TRUE,
+  #       lakecolor = toRGB('white')
+  #     )
+  #     
+  #     p <- plot_geo(data.frame(dt.map), locationmode = 'USA-states') %>%
+  #       add_trace(
+  #         z = ~breach_instance, text = ~hover, locations = ~code,
+  #         color = ~breach_instance, colors = viridis_pal(option = "D")(3)
+  #       ) %>%
+  #       colorbar(title = "Breach Instance") %>%
+  #       layout(
+  #         title = 'Number of data breach instances from 2005 to 2018',
+  #         geo = g
+  #       )
+  #     
+  #     p
+  # })
   
   output$breachScatterPlot <- renderPlotly({
     # State population data
