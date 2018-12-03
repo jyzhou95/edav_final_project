@@ -38,17 +38,20 @@ ui <- shinyUI(
                              column(9, plotlyOutput("annualBreaches", width = 900, height = 600))
                            ),
                            
-                           fluidRow(
-                             column(9, checkboxInput(inputId = "normalizePopulation",
-                                                     label = "Normalize by population: ",
-                                                     value = FALSE))
-                           ),
+                           br(),
+                           br(),
                            
                            fluidRow(
-                             column(9, plotOutput("breachMap", width = 900, height = 600))
+                             column(9, plotlyOutput("breachMap", width = 900, height = 600))
+                           ),
+                           
+                           
+                           fluidRow(
+                             column(9, plotlyOutput("breachScatterPlot", width = 900, height = 600))
                            )
                   ),
-                  tabPanel("Data Quality Exploration")
+                  tabPanel("Data Quality Exploration",
+                           )
       )
     )
   )

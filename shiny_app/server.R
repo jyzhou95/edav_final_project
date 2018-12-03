@@ -94,33 +94,54 @@ server <- function(input, output, session) {
     
   })
   
-  output$breachMap <- renderPlot({
-    if (input$normalizePopulation){
-      # State population data
-      dt.state_population <- data.table(state.x77)[,list(State = V1, Population)]
-      dt.state_population$State <- tolower(dt.state_population$State)
-      dt.state_population$Population <- dt.state_population$Population * 1000
+  output$breachMap <- renderPlotly({
       dt.states <- dt.data[nchar(state) > 2][,list(dt, state, breach_id)]
       dt.map <- dt.states[,.N, by = state]
       dt.map <- dt.map[state %in% state.name]
-      dt.map$state <- tolower(dt.map$state)
-      dt.merged_data <- merge(dt.states, dt.map, by = c("state"))
-      ggplot(dt.merged_data, aes(x = Population, y = N)) + geom_point() + 
-        xlab("State Population") + ylab("Number of Breach Instance") + theme_bw(base_size = 12)
       
-    } else{
-      dt.states <- dt.data[nchar(state) > 2][,list(dt, state, breach_id)]
-      dt.map <- dt.states[,.N, by = state]
-      dt.map <- dt.map[state %in% state.name]
-      dt.map$state <- tolower(dt.map$state)
-      # Add DC
-      dt.map <- rbind(dt.map,
-                      data.table(state = "district of columbia",
-                                 N = 0))
-      colnames(dt.map) <- c("region", "value")
-      state_choropleth(data.frame(dt.map),
-                       "Number of data breach instances from 2005 to 2018")
-    }
+      colnames(dt.map) <- c("state", "breach_instance")
+      dt.map[,category:="state"]
+      dt.map <- dt.map[order(state)]
+      dt.map[,code := state.abb]
+      dt.map[,hover := paste0("State: ", state)]
+      
+      g <- list(
+        scope = 'usa',
+        projection = list(type = 'albers usa'),
+        showlakes = TRUE,
+        lakecolor = toRGB('white')
+      )
+      
+      p <- plot_geo(data.frame(dt.map), locationmode = 'USA-states') %>%
+        add_trace(
+          z = ~breach_instance, text = ~hover, locations = ~code,
+          color = ~breach_instance, colors = 'Purples'
+        ) %>%
+        colorbar(title = "Breach Instance") %>%
+        layout(
+          title = 'Number of data breach instances from 2005 to 2018',
+          geo = g
+        )
+      
+      p
+  })
+  
+  output$breachScatterPlot <- renderPlotly({
+    # State population data
+    dt.states <- dt.data[nchar(state) > 2][,list(dt, state, breach_id)]
+    dt.map <- dt.states[,.N, by = state]
+    dt.map <- dt.map[state %in% state.name]
+    dt.merged_data <- merge(dt.state_population, dt.map, by = c("state"))
+    dt.merged_data[,population := population / 1000000]
+    
+    plt <- ggplot(dt.merged_data, aes(x = population, y = N, 
+                                      text = paste0("State: ", state,
+                                                    "\nState population: ", population,
+                                                    "\nNumber of Breach Instance: ", N))) + geom_point() + 
+      xlab("State Population (in millions)") + ylab("Number of Breach Instance") + theme_bw(base_size = 15) +
+      ggtitle("Number of breach instances vs State Population")
+    
+    ggplotly(plt, tooltip = c("text"))
   })
   
   
