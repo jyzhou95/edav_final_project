@@ -43,6 +43,22 @@ ggplot(data = b_source,aes(x=reorder(breach_source, Freq), y = Freq)) + geom_col
   ylab("Frequency of Breach Source") + xlab("") 
 
 
+#Breach_type that the att generals present on
+b_source_b_type<- dt.master %>% select(breach_source, breach_type) %>% group_by(breach_source,breach_type)%>%summarize(Freq = n())%>%arrange(desc(Freq))
+
+b_source_b_type
+
+
+
+###################
+###State freq######
+###################
+
+st_ate <-dt.master %>% select(state) %>% group_by(state)%>%summarize(Freq = n())
+
+ggplot(data = st_ate,aes(x=reorder(state, Freq), y = Freq)) + geom_col() + coord_flip() + ggtitle("Frequency of Breach Occurence by State") + 
+  ylab("Frequency") + xlab("") 
+
 ###################
 #Yimin Exploration#
 ###################
