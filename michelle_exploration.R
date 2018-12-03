@@ -21,7 +21,16 @@ ggplot(data = state_records_breached,aes(x = reorder(state,records_breached,FUN 
 region_records_breached <-dt.master %>%filter(!is.na(records_breached) & records_breached <50000 & region!="" & region!="Puerto Rico") %>% select(region, records_breached, state)
 ggplot(data = region_records_breached,aes(x = reorder(region,records_breached,FUN =median), y =records_breached)) + geom_boxplot() + coord_flip() + ggtitle("Distribution of Records Breached Across Region") + ylab("# Records Breached") + xlab("")
 
+###################
+#Missing Data #####
+###################
+install.packages("mi")
+library(mi)
+x<-missing_data.frame(dt.master)
+image(x)
 
+library(extracat)
+visna(dt.master, sort = "r")
 ###################
 #Yimin Exploration#
 ###################
