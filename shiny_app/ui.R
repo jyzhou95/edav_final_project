@@ -11,20 +11,26 @@ ui <- shinyUI(
                            ),
                            br(),
                            fluidRow(
-                             h2("Data description")
+                             h2("Data description"),
+                             column(9, textOutput("dataDescription"))
                            ),
                            br(),
                            fluidRow(
-                             h2("Data pre-processing")
+                             h2("Data pre-processing"),
+                             column(9, textOutput("dataPreProcessing"))
                            )
                            ),
                   tabPanel("Data",
                            fluidRow(
                              column(9, dataTableOutput("rawData"))
                            )),
-                  tabPanel("Breach over various industries",
+                  tabPanel("Breaches Overview",
                              fluidRow(
                                column(9, plotlyOutput("industryBreach", width = 900, height = 600))
+                             ),
+                             br(),
+                             fluidRow(
+                               column(9, plotOutput("sourceBreach", width = 900, height = 600))
                              )
                            ),
                   

@@ -14,6 +14,32 @@ server <- function(input, output, session) {
     return (chr.description)
   })
   
+  output$dataDescription <- renderText({
+    chr.description <- "We obtained our data from theDataMapT, a non-profit organization focused on documenting all 
+                        the places and entities that our personal data gets transferred to and from. theDataMapT operates 
+                        as a research project in the Data Privacy Lab, which is a program in the Institute for Quantitative 
+                        Social Science at Harvard University. Interested in seeing what types of analysis and insight students 
+                        and researchers could garner about data breaches, theDataMapT is hosting a competition where they have 
+                        released company breach data and is asking researchers to come up with novel insights from the data. 
+                        Our team chose to utilize these datasets for our EDAV final project, which can be accessed here: 
+                        https://thedatamap.org/contests/materials.php. We will also be submitting our final analysis to 
+                        theDataMapT's competition. We hope that our exploratory data analysis can help promote greater awareness 
+                        to the academic community and our fellow classmates at Columbia University regarding where and why 
+                        data breaches occur."
+    
+    return (chr.description)
+  })
+  
+  output$dataPreProcessing <- renderText({
+    chr.description <- "We decided to merge the four original datasets so that we could create a final, comprehensive data sets with 
+                        all of the important attributes that we wanted to analyze. First, we merged prc_breaches with catorgs using 
+                        the a composite key made up of cat_id and org_id, which both datasets had. Next, we merged this intermediary 
+                        data set with the categories dataset on cat_id. Lastly, we merged this output with the orgsindex dataset on org_id. 
+                        Our final dataset contained 4126 rows and 19 columns."
+    
+    return (chr.description)
+  })
+  
   output$rawData <- renderDataTable({
     return (dt.data)
   })
@@ -67,6 +93,15 @@ server <- function(input, output, session) {
         theme_bw(base_size = 15) + coord_flip()
       ggplotly(plt, source = "industryBreach")
     }
+  })
+  
+  output$sourceBreach <- renderPlot({
+    dt.breach_source_count <- dt.data[,.N, by = list(breach_source)]
+    dt.breach_source_count$breach_source <- factor(dt.breach_source_count$breach_source,
+                                                   levels = dt.breach_source_count[order(N, decreasing = FALSE)]$breach_source)
+    ggplot(dt.breach_source_count, aes(x = breach_source, y = N)) + geom_bar(stat = "identity") + 
+      xlab("Breach Source") + ylab("Frequency of Breach Source") + theme_bw(base_size = 15) + 
+      ggtitle("Frequency of Source of Breaches") + coord_flip()
   })
   
   output$annualBreaches <- renderPlot({
