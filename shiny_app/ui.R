@@ -68,7 +68,11 @@ ui <- shinyUI(
                            ),
                            br(),
                            
-                           tags$img(src='missing_data.jpeg', width = "900px", height = "600px")
+                           tags$img(src='missing_data.jpeg', width = "900px", height = "600px"),
+                           
+                           fluidRow(
+                             column(9, plotOutput("missingDataFrequency"), width = 900, height = 600)
+                           )
                            
                            )
       )

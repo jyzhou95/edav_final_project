@@ -1,0 +1,303 @@
+---
+title: "A Visual Analysis of Data Breaches from 2005 to 2018"
+author: "Michelle Chen, Yimin Wang, Jing Yi Zhou"
+date: "December 8, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Introduction
+
+In light of recent data breaches to major organizations such as Facebook and more recently Marriott, companies are beginning to take extra precautions to protect their data. Data breaches are not only costly to recuperate from, but also hurt businesses and consumers in the long-run. This movement sparks great discussion about the types of companies and industries that are typically targeted, when breaches occur, how the breaches are broadcasted to the public, and just how much of our data is at stake. Using United States data breaches information from 2005 to 2018, our group hopes to craft a comprehensive story centered on these breaches and help the public better understand why they are happening through meaningful visualizations and interactivity. 
+
+Our team consisted of Michelle Chen, Yimin Wang, and Jingyi Zhou. The delegation of tasks was as follows: We all came together to come up with a coherent story to introduce novel insights using our visualizations. Michelle was in charge of the visualizations related to the number of records breached for specific categories, states and regions. These initial visualizations helped us to establish an understanding of the distribution of records breached across various states, categories, and regions. Yimin sought to analyze the breach type attribute in depth by analyzing the frequency of specific breach types across various industries and regions. Lastly, Jingyi plotted time-series data and visualizations related to the breach source. Report-wise, we each wrote our own respective sections related to the parts of the data we worked on. Jingyi Zhou consolidated everything into a nice shiny app for presentation purposes of our visualizations and analysis.  
+
+
+### Description of data
+
+We obtained our data from theDataMap, a non-profit organization focused on documenting all the places and entities that our personal data gets transferred to and from. theDataMap operates as a research project in the Data Privacy Lab, which is a program in the Institute for Quantitative Social Science at Harvard University. Interested in seeing what types of analysis and insight students and researchers could garner about data breaches, theDataMap is hosting a competition where they have released company breach data and is asking researchers to come up with novel insights from the data. Our team chose to utilize these datasets for our EDAV final project, which can be accessed here: https://thedatamap.org/contests/materials.php. We will also be submitting our final analysis to theDataMapT's competition. We hope that our exploratory data analysis can help promote greater awareness to the academic community and our fellow classmates at Columbia University regarding where and why data breaches occur.
+
+### Analysis of data quality
+
+The raw data comes in the form of four files. Note that we did not use every single . They are as follows: 
+
+**orgsindex.csv** is a list of organizations and entities whose data sharing transaction(s) appear on theDataMap. The file has 5351 rows in total, not including the header row. The fields are as follows:
+
+* *OrgID* - A unique identifier associated with the entity.
+
+* *Name* - The name of the entity.
+
+* *SourceType* - The type of source from which the name appeared.
+
+**categories.csv** is a list of categories of data holders of health data. The file has 54 rows, not including the header row. These correspond to the nodes on the graph itself. The fields are as follows:
+
+* *CatID* - The unique identifier associated with a node on the graph.
+
+* *CatName* - The name that appears for the node.
+
+* *Coordinates* - The 4 pixel coordinates that locate the box associated with the node.
+
+* *Hover* - The descriptive text that appears when the mouse hovers over the box associated with the node.
+
+**orgsindex.csv** is a list of organizations and entities whose data sharing transaction(s) appear on theDataMap. The file has 5351 rows in total, not including the header row. The fields are as follows:
+
+* *OrgID* - is an association list of categories (CatID) from the categories file and organizations (OrgID) from the OrgsIndex file. The file has 5336 rows, not including the header row. The fields are:
+
+* *Type* - The kind of source that provided the information, such as "Discharge" or "Breaches".
+
+**prcbreaches2005-18.csv** contains a list of breaches associated with different categories and organizations. The file has 4126 rows, not 
+including the header row. The fields are:
+
+* *Records.Breached* - The total number of records breached for some of the organizations.
+* *Records.Breached...Detail* - The number of records breached with more details about the breaches.
+* *Name* - The name of the organization.
+* *CatID* - The category ID used in the other data files.
+* *Total.Records* - The total number of breaches for all of the organzations (more information than Records.Breached).
+* *Region* - The region that the organization is located in.
+* *Contact..etc.* - The contact information for the organization.
+* *Category_dm* - The name of the category associated with the CatID.
+* *Entity_prc* - The type of organization.
+* *State* - The state that the organization is located in.
+* *OrgID* - The Organization ID.
+* *Location* - The city that the organization is located in.
+* *Date.Made.Public* - The date that the breaches were made public.
+* *Year* - The year that the breaches were made public.
+* *Source.of.Breach.Notification* - The source that publicized the breaches.
+* *Type* - The type of breach.
+* *Description* - The description of the breach.
+* *Example (HTML)* - The HTML code used to generate the list of examples for each category in the health visualization.
+
+#### Merging the data together
+
+We decided to merge the four original datasets together so that we could create one final, comprehensive data set with all of the important attributes that we wanted to analyze. First, we merged prc_breaches with catorgs using the a composite key made up of cat_id and org_id. Next, we merged this intermediary data set with the categories dataset on cat_id. Lastly, we merged this output with the orgsindex dataset on org_id. Our final dataset contained 4126 rows and 19 columns.
+
+
+
+The columns are as follows:
+
+* Org_id (ID) - The unique identifier for the organization
+
+* Cat_id (ID) - The unique identifier for the category of organization
+
+* Cat_name (Categorical) - The name of the category
+
+* Records_breached (Continuous) - The number of records breached if there were records breached. NA if no records were breached.
+
+* Records_breached_detail (String) - Description of the records breached. NA if no description. Some rows include total number of records maintained by the organization. Some rows include a note that no SSNs were breached. Some rows include miscellaneous information.
+
+* Name (String) - The name of the organization
+
+* State (Categorical) - The state that the organization is in
+
+* Total_records (Continuous) - Total number of records maintained by the organization
+
+* Category (Categorical) - Name of the category of the organization
+
+* Entity_type (Categorical) - Code for the entity type
+  + BSO - business other
+  + BSF - business - financial and insurance services
+  + BSR - business - retail and merchant
+  + EDU - education institutions
+  + GOV - government and military
+  + MED - healthcare - medical provider
+  + NGO - nonprofit organizations
+
+* Breach_source (Categorical) - The source that published the breach
+
+* Breach_type (Categorical) - The type of breach that occurred
+  + DISC - Unintended disclosure
+  + HACK - Hacking
+  + CARD - Payment card fraud
+  + INSD - Insider
+  + PHYS - Physical loss
+  + PORT - Portable device loss
+  + STAT - Stationary device loss
+  + UNKN - Cause of breach unknown
+
+* Region (categorical) - The region that the company is in
+
+* Breach_id (ID) - Unique identifier for the breach
+
+```{r}
+options(warn=-1)
+library(data.table)
+library(glue)
+library(vcd)
+library(tidyverse)
+library(data.table)
+library(ggplot2)
+library(lubridate)
+library(ggthemes)
+library(viridis)
+library(extracat)
+library(glue)
+library(ggmosaic)
+  
+
+parent_dir <- getwd()
+
+dt.categories <- fread(glue("{parent_dir}/health_care_data/categories.csv"))
+dt.catorgs <- fread(glue("{parent_dir}/health_care_data/catsorgs.csv"))
+dt.orgsindex <- fread(glue("{parent_dir}/health_care_data/orgsindex.csv"))
+dt.prcbreaches <- fread(glue("{parent_dir}/health_care_data/prcbreaches2005-18.csv"))
+
+dt.categories_final <- dt.categories[,list(cat_id = CatID,
+                                     cat_name = CatName)]
+
+dt.catorgs_final <- dt.catorgs[,list(cat_id = CatID,
+                               org_id = OrgID,
+                               type = Type)]
+
+dt.orgsindex_final <- dt.orgsindex[,list(org_id = OrgID,
+                                   company_name = Name,
+                                   source_type = SourceType)]
+
+dt.prcbreaches_final <- dt.prcbreaches[,list(records_breached = Records.Breached,
+                                       records_breached_detail = Records.Breached...Detail,
+                                       name = Name,
+                                       cat_id = CatID,
+                                       total_records = Total.Records,
+                                       region = Region,
+                                       category = Category_dm,
+                                       entity_type = Entity_prc,
+                                       state = State,
+                                       org_id = OrgID,
+                                       location = Location,
+                                       dt = Date.Made.Public,
+                                       breach_source = Source.of.Breach.Notification,
+                                       breach_type = Type)]
+
+dt.orgsindex_final <- unique(dt.orgsindex_final, by = c("org_id"))
+
+dt.master <- merge(merge(merge(dt.prcbreaches_final, dt.catorgs_final, by = c("cat_id", "org_id"), all.x = TRUE),
+                   dt.categories_final, by = c("cat_id"), all.x = TRUE),
+                   dt.orgsindex_final, by = c("org_id"), all.x = TRUE)
+
+# Fix region
+dt.region <- unique(dt.master[!is.na(region)][,list(region, state)])
+
+# Merge it backc on
+dt.master[,region := NULL]
+dt.master <- merge(dt.master, dt.region, by = c("state"), all.x = TRUE)
+
+# Add unique identifier to each breach
+dt.master$breach_id <- 1:nrow(dt.master)
+
+dt.date_format1 <- dt.master[grepl("\\-", dt)]
+dt.date_format1$dt <- as.Date(dt.date_format1$dt, format = "%d-%b-%y")
+
+dt.date_format2 <- dt.master[grepl("\\/", dt)]
+dt.date_format2$dt <- as.Date(dt.date_format2$dt, format = "%m/%d/%Y")
+
+dt.data <- rbind(dt.date_format1,
+                  dt.date_format2)
+
+dt.data[,dt := as.Date(dt, format = "%m/%d/%Y")]
+
+dt.data_raw <- dt.data
+
+  
+# Rows where records breached is NA is assumed to be 0 
+dt.data[is.na(records_breached) & total_records == 0]$records_breached <- 0
+  
+# Merge breach type name to data
+dt.breach_type_name <- data.table(breach_type = c("DISC", "HACK", "CARD", "INSD", "PHYS", "PORT", "STAT", "UNKN"),
+                                    breach_type_name = c("Unintended Disclosure",
+                                                         "Hacking",
+                                                         "Payment Card Fraud",
+                                                         "Insider Fraud",
+                                                         "Physical Loss",
+                                                         "Portable Device Loss",
+                                                         "Stationary Device Loss",
+                                                         "Unknown"))
+dt.data <- merge(dt.data, dt.breach_type_name, by = c("breach_type"))
+  
+# State population data retrieved from Wikipedia
+dt.state_population <- fread(paste0(parent_dir, "/health_care_data/state_population.csv"))
+dt.state_population[,V1 := NULL]
+```
+
+
+### Missing Data Analysis:
+
+Before diving into our data visualizations, we wanted to examine the amount of missing data in our data set. We first used the mi package's missing_data.frame() function to obtain a visual of the amount of missing data for each observation/row number and a corresponding column variable. Red in the resulting chart means that there is very few or no missing data. We see that the majority of the data is present. However, the two columns, records_breached and records_breached_detail, presented a great deal of black, meaning that those cells/instances in the column have missing data. Since records_breached_detail is simply an expanded version of records_breached with additional qualitative details, from a numeric records breached perspective it is redundant and therefore the only column with a concerning amount of missing data is the records_breached continuous variable column. 
+
+```{r}
+library(mi)
+dt.data_raw$dt <- as.character(dt.data_raw$dt)
+x<-missing_data.frame(dt.data_raw)
+image(x)
+```
+
+To get a better look at various missing data patterns in our dataset, we used the library extracat and specifically the visna chart. We did a row sort on the visna chart to sort from most common to least common missing value combination. This type of visna chart is useful because we can see very easily which combinations of missing data values are most common as well as the relative frequencies of these missing data combinations. 
+
+Looking at the vertical distributions, the only significant amount of missing data is from records_breached and records_breacthed_detail. Looking at the horizontal distributions, we can see that the most common missing value combination is records_breached and records_breached_detail. That makes sense because if there is no information about how many records were breached or if there were no records breached then there would be no additional detail that corresponds to it. We can also see that records_breached by itself is the second most frequent missing data value. At a similar level is no missing values at all. 
+
+```{r}
+visna(dt.data, sort = "r")
+```
+
+The missing_data.frame() and visna() chart functions gave us a good start to the analysis of our missing data. This seemed like an alarming amount of missing data from the records_ breached column. We compared the records_breached, records_breached_detail, and total records columns and found potential reasons for these missing values. The NA values did not necessarily mean that the data point was missing so to speak. We found that there were no instances where the value of records_breached was 0, which would weird if that were actually the case. We looked at the breakdown in relative frequency of the breach type between breaches where records_breached was NA versus when it wasn't. We found that there was many more instances of physical loss and unintended disclosures when records_breached was NA.  In addition, records_breached. We figured that this meant that in actuality, a lot of the NAs actually meant 0 records were breached. It would make sense for there to be no records breached in these cases, since it's unlikely that personal records what be what was lost or unintentionally disclosed. And only lastly and very infrequently are there actually missing values. Ultimately, this does not affect our analysis and exploration much because we are mainly looking at breach instances--it doesn't matter whether there is data on the number of records breached. For the analysis that we are doing on records_breached, it doesn't matter that much that there are a lot of 0s because we are looking at the distribution of number of records breached given that a breach occurred in the first place.
+
+### Main analysis
+
+#### Data cleaning process
+
+While we were attempting to merge our raw CSV files to create our final data set, we ran into an issue where columns representing the same data across different CSV files had different names with inconsistent capitalization. We decided to standardize everything and made sure that the naming was consistent and in lower case. Afterward, we joined everything into a mega data table and subsetted to keep the columns relevant to our analysis. The most significant data cleaning process was formatting the reported dates. In the original *prcbreaches2005-18.csv* file, there wasn't a standardized date format nor a consistent pattern. We used a simple regex pattern detection function to segregate the rows into two distinct groups and then converted it to the standard R date format. Afterward, we checked to make sure no rows of data were dropped by comparing the numbers in our data set against the original data set. Afterward, we wrote the cleaned and formatted data table to a CSV file.
+
+#####Time series graph
+
+```{r}
+dt.time_series <- dt.data[,list(dt, breach_id)]
+dt.time_series <- dt.time_series[order(dt)]
+dt.year <- dt.time_series[,.N, by = year(dt)]
+dt.year[,year := as.Date(paste0(year, "-01-01"))]
+      
+dt.plot <- ggplot(dt.year, aes(x = year, y = N)) + 
+                  geom_bar(stat = "identity", fill = "lightblue") + 
+                  theme_bw(base_size = 15) + 
+                  xlab("Date") + ylab("Number of breach instances") + 
+                  ggtitle("Number of data breaches from 2005 until 2018") +
+                  scale_x_date(date_breaks = "1 year", date_labels = "%Y")
+dt.plot
+```
+
+Since our dataset comprised of data breaches from 2005 to 2018, one of the first aspects we wanted to examine was how the frequency of breaches changes over time. To do so, we counted up the number of instances (rows) for each year and plotted the data using a bar chart. Over time, there seems to be fluctuations in the number of breach instances with some years experiencing much higher frequencies than others. However, the overall general trend is still an overall increase in number of breach instances over time. In lieu of ever-increasing amounts of data being produced by corporations and organizations and as a result, more opportunities for breaches to occur, this insight seems in line with what we would have speculated to be the trend.  
+
+##### Distribution of Records_breached vs Category/Industry
+
+```{r}
+# Filtered by
+# Have actual records breach data
+# Number of instances for each category must be at least 5
+# Remove outlier
+dt.data_temp <- dt.data[!is.na(records_breached)]
+cat_records_breached <- dt.data_temp[,list(records_breached, cat_name)]
+    
+# Count numbers of categories
+dt.cat_count <- cat_records_breached[,.N, by = list(cat_name)]
+dt.cat_count <- dt.cat_count[N >= 5]
+    
+cat_records_breached <- cat_records_breached[cat_name %in% dt.cat_count$cat_name]
+vec_cat <- cat_records_breached[,list(med = median(records_breached)), by = list(cat_name)][order(med)]$cat_name
+    
+cat_records_breached$cat_name <- factor(x = cat_records_breached$cat_name, levels = vec_cat)
+plt <- ggplot(data = cat_records_breached[records_breached < 100000],aes(x = cat_name, y =records_breached)) + 
+        geom_boxplot(fill = "lightblue") + 
+        ggtitle("Distribution of Records Breached Across Category/Industry") + 
+        ylab("Number of records breached") + xlab("") + scale_y_continuous(labels = scales::comma) + 
+        theme_bw(base_size = 15) + coord_flip()
+
+plt      
+```
+
+To obtain this distribution, we went ahead and plotted the data using boxplots. Boxplots are a beneficial way to visual the range and median, amongst other critical summary statistics. Plotting the boxplot using geom_boxplot() initially produced a chart where each distribution across industries was very small and unreadable due to very high outliers corresponding to massive data breaches. To address this challenge, we filtered the data to deal with rows with quantities of records breached <100,000 and records breached > 0. Furthermore, we also decided to look at industries with at least 5 breach instances (industry appeared at least five times in the dataset). The reason we decided to filter the data this way is so that we could focus on industries with frequent and impactful breach events. In addition,  Furthermore, since during the data cleaning step we converted many 'NA' to 0, we realized that including the 0 records breached values may skew our boxplot distribution. We also ignored instances with 'NA' for number of records breached. After doing so, we can see the distributions of records breached for each industry much more clearly. From this chart (Distribution of Records Breached Across Category/Industry), we can see that Blood & Tissue, Home Health, Researcher, Payer (Insurer), and Pharmacy have the highest number of records breached when sorted by median number of records. 
+
+
+
+
+
+

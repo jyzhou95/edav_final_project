@@ -228,6 +228,31 @@ server <- function(input, output, session) {
   output$missingData <- renderPlot({
     visna(dt.data, sort = "r")
   })
+  
+  output$missingDataFrequency <- renderPlot({
+    # Yimin frequency bar plot
+    dt.frequency_bar_plot <- dt.data[,list(records_breached, breach_type_name)]
+    dt.frequency_bar_plot[,is_records_breached_na := is.na(records_breached)]
+    
+    dt.frequency_bar_plot_total <- dt.frequency_bar_plot[,.N, by = list(breach_type_name)]
+    colnames(dt.frequency_bar_plot_total) <- c("breach_type_name", "total")
+    
+    dt.frequency_bar_plot_count <- dt.frequency_bar_plot[,.N, by = list(breach_type_name, is_records_breached_na)]
+
+    dt.frequency_bar_plot_count <- merge(dt.frequency_bar_plot_count, dt.frequency_bar_plot_total, by = c("breach_type_name"))
+    dt.frequency_bar_plot_count[,percentage := N / total]
+    
+    dt.order.this <- dt.frequency_bar_plot_count[is_records_breached_na == TRUE][order(percentage, decreasing = TRUE)]
+    
+    dt.frequency_bar_plot$breach_type_name <- factor(dt.frequency_bar_plot$breach_type_name, 
+                                                     levels = dt.order.this$breach_type_name)
+    
+    
+    
+    ggplot(data = dt.frequency_bar_plot) + 
+      geom_mosaic(aes(x = product(is_records_breached_na, breach_type_name), fill = is_records_breached_na)) +
+      scale_fill_brewer(palette = "Set1") + theme_bw(base_size = 15) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  })
 
 }
   
