@@ -132,7 +132,9 @@ $(document).ready(function () {
 <h3>Introduction</h3>
 <p>In light of recent data breaches to major organizations such as Facebook and more recently Marriott, companies are beginning to take extra precautions to protect their data. Data breaches are not only costly to recuperate from, but also hurt businesses and consumers in the long-run. This movement sparks great discussion about the types of companies and industries that are typically targeted, when breaches occur, how the breaches are broadcasted to the public, and just how much of our data is at stake. Using United States data breaches information from 2005 to 2018, our group hopes to craft a comprehensive story centered on these breaches and help the public better understand why they are happening through meaningful visualizations and interactivity.</p>
 <p>Our team consisted of Michelle Chen, Yimin Wang, and Jingyi Zhou. The delegation of tasks was as follows: We all came together to come up with a coherent story to introduce novel insights using our visualizations. Michelle was in charge of the visualizations related to the number of records breached for specific categories, states and regions. These initial visualizations helped us to establish an understanding of the distribution of records breached across various states, categories, and regions. Yimin sought to analyze the breach type attribute in depth by analyzing the frequency of specific breach types across various industries and regions. Lastly, Jingyi plotted time-series data and visualizations related to the breach source. Report-wise, we each wrote our own respective sections related to the parts of the data we worked on. Jingyi Zhou consolidated everything into a nice shiny app for presentation purposes of our visualizations and analysis.</p>
-<p>Our Shiny App is located here: <a href="https://jing-yi-zhou.shinyapps.io/shiny_app/" class="uri">https://jing-yi-zhou.shinyapps.io/shiny_app/</a></p>
+<p>Our ShinyApp is located here: <a href="https://jing-yi-zhou.shinyapps.io/shiny_app/" class="uri">https://jing-yi-zhou.shinyapps.io/shiny_app/</a></p>
+<p>Our Github page is located here: <a href="https://github.com/jyzhou95/edav_final_project" class="uri">https://github.com/jyzhou95/edav_final_project</a></p>
+<p>OUR Executive summary is located here:</p>
 </div>
 <div id="description-of-data" class="section level3">
 <h3>Description of data</h3>
@@ -552,6 +554,9 @@ plt</code></pre>
 <p>We wanted to see if there were any states that had an outsized number of breach attempts. We cannot look at just the net number of attempts because some states will have more companies than others. In order to provide a sense of scale for these metrics, we wanted to look at breach attempts scaled by state population (as a proxy for the number of companies in that state). We used data from the US Census Bureau to get the populations of each state. They are from Q3 of 2017. We plotted number of breach attempts by the population for each state.</p>
 <p>Looking at the relationship between population size and number of breaches, we see a clear positive linear relationship, which is what we would expect to find: as population size increases, the number of breaches increase as well. Other initial findings using time series visualizations also confirmed that the number of breach instances per year increases over time.This aligns with our expectations that as the amount of data being produced increases, entities are at greater risk for a potential compromise with their data.</p>
 <p>Upon examining the data from a regional perspective, we found that Maryland and California both experienced more breaches than expected. A potential reason for these outsized number of breaches for California and Maryland could be because California is a big tech hub with a huge population and Maryland is a big hub for health care technologies, which would lend for increased attempts at data breaching.</p>
+</div>
+<div id="limitations-future-directions-lessons-learned" class="section level4">
+<h4>Limitations, Future Directions, Lessons Learned</h4>
 </div>
 </div>
 
