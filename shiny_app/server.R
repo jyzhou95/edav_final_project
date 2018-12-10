@@ -56,10 +56,14 @@ server <- function(input, output, session) {
     dt.cat_count <- cat_records_breached[,.N, by = list(cat_name)]
     dt.cat_count <- dt.cat_count[N >= 5]
     
+    
     cat_records_breached <- cat_records_breached[cat_name %in% dt.cat_count$cat_name]
+    cat_records_breached <- cat_records_breached[records_breached < 100000 & records_breached > 0]
+    
     vec_cat <- cat_records_breached[,list(med = median(records_breached)), by = list(cat_name)][order(med)]$cat_name
     
     cat_records_breached$cat_name <- factor(x = cat_records_breached$cat_name, levels = vec_cat)
+    
       
     dt.click_event_industry_breach <- data.table(event_data("plotly_click", source = "industryBreach"))
 
@@ -86,7 +90,7 @@ server <- function(input, output, session) {
       
       
     } else{
-      plt <- ggplot(data = cat_records_breached[records_breached < 100000],aes(x = cat_name, y =records_breached)) + 
+      plt <- ggplot(data = cat_records_breached, aes(x = cat_name, y =records_breached)) + 
         geom_boxplot(fill = "lightblue") + 
         ggtitle("Distribution of Records Breached Across Category/Industry") + 
         ylab("Number of records breached") + xlab("") + scale_y_continuous(labels = scales::comma) + 

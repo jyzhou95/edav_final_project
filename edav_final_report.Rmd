@@ -15,11 +15,17 @@ In light of recent data breaches to major organizations such as Facebook and mor
 
 Our team consisted of Michelle Chen, Yimin Wang, and Jingyi Zhou. The delegation of tasks was as follows: We all came together to come up with a coherent story to introduce novel insights using our visualizations. Michelle was in charge of the visualizations related to the number of records breached for specific categories, states and regions. These initial visualizations helped us to establish an understanding of the distribution of records breached across various states, categories, and regions. Yimin sought to analyze the breach type attribute in depth by analyzing the frequency of specific breach types across various industries and regions. Lastly, Jingyi plotted time-series data and visualizations related to the breach source. Report-wise, we each wrote our own respective sections related to the parts of the data we worked on. Jingyi Zhou consolidated everything into a nice shiny app for presentation purposes of our visualizations and analysis.  
 
-Our Shiny App is located here: https://jing-yi-zhou.shinyapps.io/shiny_app/
+Our ShinyApp is located here: https://jing-yi-zhou.shinyapps.io/shiny_app/
+
+Our Github page is located here: https://github.com/jyzhou95/edav_final_project
+
+OUR Executive summary is located here: 
 
 ### Description of data
 
 We obtained our data from theDataMap, a non-profit organization focused on documenting all the places and entities that our personal data gets transferred to and from. theDataMap operates as a research project in the Data Privacy Lab, which is a program in the Institute for Quantitative Social Science at Harvard University. Interested in seeing what types of analysis and insight students and researchers could garner about data breaches, theDataMap is hosting a competition where they have released company breach data and is asking researchers to come up with novel insights from the data. Our team chose to utilize these datasets for our EDAV final project, which can be accessed here: https://thedatamap.org/contests/materials.php. We will also be submitting our final analysis to theDataMapT's competition. We hope that our exploratory data analysis can help promote greater awareness to the academic community and our fellow classmates at Columbia University regarding where and why data breaches occur.
+
+We also supplemented our analysis with the most recent state population data from the US Census Bureau. 
 
 ### Analysis of data quality
 
@@ -243,6 +249,35 @@ visna(dt.data, sort = "r")
 
 The missing_data.frame() and visna() chart functions gave us a good start to the analysis of our missing data. This seemed like an alarming amount of missing data from the records_ breached column. We compared the records_breached, records_breached_detail, and total records columns and found potential reasons for these missing values. The NA values did not necessarily mean that the data point was missing so to speak. We found that there were no instances where the value of records_breached was 0, which would weird if that were actually the case. We looked at the breakdown in relative frequency of the breach type between breaches where records_breached was NA versus when it wasn't. We found that there was many more instances of physical loss and unintended disclosures when records_breached was NA.  In addition, records_breached. We figured that this meant that in actuality, a lot of the NAs actually meant 0 records were breached. It would make sense for there to be no records breached in these cases, since it's unlikely that personal records what be what was lost or unintentionally disclosed. And only lastly and very infrequently are there actually missing values. Ultimately, this does not affect our analysis and exploration much because we are mainly looking at breach instances--it doesn't matter whether there is data on the number of records breached. For the analysis that we are doing on records_breached, it doesn't matter that much that there are a lot of 0s because we are looking at the distribution of number of records breached given that a breach occurred in the first place.
 
+#### Mosaic Plot of Region and Breach Type
+
+```{r}
+
+dt.frequency_bar_plot <- dt.data[,list(records_breached, breach_type_name)]
+dt.frequency_bar_plot[,is_records_breached_na := is.na(records_breached)]
+
+dt.frequency_bar_plot_total <- dt.frequency_bar_plot[,.N, by = list(breach_type_name)]
+colnames(dt.frequency_bar_plot_total) <- c("breach_type_name", "total")
+    
+dt.frequency_bar_plot_count <- dt.frequency_bar_plot[,.N, by = list(breach_type_name, is_records_breached_na)]
+
+dt.frequency_bar_plot_count <- merge(dt.frequency_bar_plot_count, dt.frequency_bar_plot_total, by = c("breach_type_name"))
+dt.frequency_bar_plot_count[,percentage := N / total]
+    
+dt.order.this <- dt.frequency_bar_plot_count[is_records_breached_na == TRUE][order(percentage, decreasing = TRUE)]
+    
+dt.frequency_bar_plot$breach_type_name <- factor(dt.frequency_bar_plot$breach_type_name, 
+                                                     levels = dt.order.this$breach_type_name)
+    
+ggplot(data = dt.frequency_bar_plot) + 
+      geom_mosaic(aes(x = product(is_records_breached_na, breach_type_name), fill = is_records_breached_na)) +
+      scale_fill_brewer(palette = "Set1") + theme_bw(base_size = 20) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+      ggtitle("Interaction between breach type \nand presence of records breached attribute") + xlab("Breach type") + ylab("Was Records Breached")
+
+```
+
+
+
 ### Main analysis
 
 #### Data cleaning process
@@ -259,7 +294,7 @@ dt.year[,year := as.Date(paste0(year, "-01-01"))]
       
 dt.plot <- ggplot(dt.year, aes(x = year, y = N)) + 
                   geom_bar(stat = "identity", fill = "lightblue") + 
-                  theme_bw(base_size = 15) + 
+                  theme_bw(base_size = 20) + 
                   xlab("Date") + ylab("Number of breach instances") + 
                   ggtitle("Number of data breaches from 2005 until 2018") +
                   scale_x_date(date_breaks = "1 year", date_labels = "%Y")
@@ -281,21 +316,26 @@ cat_records_breached <- dt.data_temp[,list(records_breached, cat_name)]
 # Count numbers of categories
 dt.cat_count <- cat_records_breached[,.N, by = list(cat_name)]
 dt.cat_count <- dt.cat_count[N >= 5]
-    
+
+
 cat_records_breached <- cat_records_breached[cat_name %in% dt.cat_count$cat_name]
+cat_records_breached <- cat_records_breached[records_breached < 100000 & records_breached > 0]
+
 vec_cat <- cat_records_breached[,list(med = median(records_breached)), by = list(cat_name)][order(med)]$cat_name
     
 cat_records_breached$cat_name <- factor(x = cat_records_breached$cat_name, levels = vec_cat)
-plt <- ggplot(data = cat_records_breached[records_breached < 100000],aes(x = cat_name, y =records_breached)) + 
+
+
+plt <- ggplot(data = cat_records_breached,aes(x = cat_name, y =records_breached)) + 
         geom_boxplot(fill = "lightblue") + 
         ggtitle("Distribution of Records Breached Across Category/Industry") + 
         ylab("Number of records breached") + xlab("") + scale_y_continuous(labels = scales::comma) + 
-        theme_bw(base_size = 15) + coord_flip()
+        theme_bw(base_size = 20) + coord_flip()
 
 plt      
 ```
 
-To obtain this distribution, we went ahead and plotted the data using boxplots. Boxplots are a beneficial way to visual the range and median, amongst other critical summary statistics. Plotting the boxplot using geom_boxplot() initially produced a chart where each distribution across industries was very small and unreadable due to very high outliers corresponding to massive data breaches. To address this challenge, we filtered the data to deal with rows with quantities of records breached <100,000 and records breached > 0. Furthermore, we also decided to look at industries with at least 5 breach instances (industry appeared at least five times in the dataset). The reason we decided to filter the data this way is so that we could focus on industries with frequent and impactful breach events. In addition,  Furthermore, since during the data cleaning step we converted many 'NA' to 0, we realized that including the 0 records breached values may skew our boxplot distribution. We also ignored instances with 'NA' for number of records breached. After doing so, we can see the distributions of records breached for each industry much more clearly. From this chart (Distribution of Records Breached Across Category/Industry), we can see that Blood & Tissue, Home Health, Researcher, Payer (Insurer), and Pharmacy have the highest number of records breached when sorted by median number of records. 
+To obtain this distribution, we went ahead and plotted the data using boxplots. Boxplots are a beneficial way to visual the range and median, amongst other critical summary statistics. Plotting the boxplot using geom_boxplot() initially produced a chart where each distribution across industries was very small and unreadable due to very high outliers corresponding to massive data breaches. To address this challenge, we filtered the data to deal with rows with quantities of records breached <100,000 and records breached > 0. Furthermore, we also decided to look at industries with at least 5 breach instances (industry appeared at least five times in the dataset). The reason we decided to filter the data this way is so that we could focus on industries with frequent and impactful breach events. In addition,  Furthermore, since during the data cleaning step we converted many 'NA' to 0, we realized that including the 0 records breached values may skew our boxplot distribution. We also ignored instances with 'NA' for number of records breached. After doing so, we can see the distributions of records breached for each industry much more clearly. From this chart (Distribution of Records Breached Across Category/Industry), we can see that Medical Devices, Blood & Tissue, Analytics, Employer, and Researcher have the highest number of records breached when sorted by median number of records. 
 
 #### Occurrences of Breaches within each Category/Industry
 
@@ -312,7 +352,7 @@ ggplot(dt.cat_freq, aes(x = category, y = N), fill = "lightblue") +
 ```
 
 
-After looking at the distribution of number of records breached within each industry, we wanted to explore if the top 5 industries with the greatest median number of records breached were also the most targeted industries from a breach frequency perspective. To plot the frequency of breaches across industries, we chose to utilize a barplot. A barplot is great for this because it is immediately clear what the magnitude of each bar is as well as the relative magnitudes between the bars. We found that discharge data, payer(insurer), physician/hospital, public health, and employer were the top 5 categories that were impacted by data breaches. Comparing this chart to the previous visualization, Payer(Insurer) whas the only overlapping industry. We also observed that for certain industries such as Public Health, a high frequency of data breaches was not necessarily indicative of the median quantity of data that was compromised for each breach, which you would expect to be higher as well. This means that some industries seem to more heavily targeted than others, and some industries may be targeted less, but each breach occurrence still results in a huge compromise to the organization's data.
+After looking at the distribution of number of records breached within each industry, we wanted to explore if the top 5 industries with the greatest median number of records breached were also the most targeted industries from a breach frequency perspective. To plot the frequency of breaches across industries, we chose to utilize a barplot. A barplot is great for this because it is immediately clear what the magnitude of each bar is as well as the relative magnitudes between the bars. We found that discharge data, payer(insurer), physician/hospital, public health, and employer were the top 5 categories that were impacted by data breaches. Comparing this chart to the previous visualization, Employer is the the only overlapping industry. We also observed that for certain industries such as Public Health, which has a history of high frequency of data breaches, the median quantity of data that was compromised for each breach was not necessarily very high. This means that just because industry A has more breach instances than industry B, does not imply that industry A will experience a greater magnitude of impact based on total number of records breached overall.
 
 #### Breach_Type breakdown within Various Industries
 
@@ -333,9 +373,10 @@ plt <- ggplot(dt.plot.this, aes(x = breach_type,
                                 fill = breach_type_name,
                                 text = paste0("Breach type name: ", breach_type_name,
                                               "\nRecords Breached: ", prettyNum(records_breached, scientific=FALSE, big.mark=",")))) + 
-  geom_bar(stat = "identity") + theme_bw(base_size = 15) + 
+  geom_bar(stat = "identity") + theme_bw(base_size = 20) + 
   ggtitle(paste0("Total Records Breached for ", chr.industry, " by Breach Type")) + 
   xlab("Breach Type") + ylab("Total Records Breached") + scale_fill_colorblind() + scale_y_log10()
+plt
 ```
 
 We wanted to dive deeper and explore specific industries to understand the major reasons that data was compromised, which can be examined using the breach_type attribute. To do so, we broke the total records breached down for each industry by breach type. We went ahead and colored the bars various colors to represent the different breach types. Let us start by examining the Payer(Insurer) industry. For the Payer (Insurer) industry, we find that portable device loss (PORT), unintended disclosure (DISC), stationery device loss (STAT), Unknown (UNKN), and Hacking (HACK) were the top 5 breach_types experienced along with a few others. However, these breach types are not present in all industries. Depending on the context of the industry, the industry may be more susceptible to some breach types and not others. For instance, the Blood and Tissue industry only have four major breach types: 1) Insider Fraud (INSD), 2) Portable Device Loss (PORT), 3) Unintended Disclosure (DISC), and 4) Stationery Device Loss (STAT). 
@@ -345,40 +386,41 @@ We wanted to dive deeper and explore specific industries to understand the major
 ```{r}
 dt.region <- dt.data[nchar(region) > 2][,list(dt, region, records_breached)]
 dt.region <- dt.region[!is.na(records_breached) & records_breached > 0]
+dt.region <- dt.region[region != "Puerto Rico"]
 ggplot(data = dt.region[records_breached < 100000],
        aes(x = reorder(region,records_breached,FUN =median), y =records_breached)) + geom_boxplot() + 
   coord_flip() + ggtitle("Distribution of Records Breached Across Region") + 
-  ylab("Number of Records Breached") + xlab("") + theme_bw(base_size = 15)
+  ylab("Number of Records Breached") + xlab("") + theme_bw(base_size = 20)
 ```
 
 For this particular visualization, we faceted the number of records_breached by region. We turned to geom_box() to better visualize our distribution across regions. Prior to plotting the data, we left out the instances with 'NA' and focused on records_breached greater than 0 records and less than 50,000 records. Filtering the data down to this range helped us obtain a meaningful visualization where we can adequately observe the underlying distribution of number records breached values while minimizing the effects of potential skewness due to '0' records breached measures. When sorted by median number of records breached, there does not seem to be a huge discrepancy in the distribution of number of records breached based on region. However, it does seem like there are a fair number of data points scattered to the right of each boxplot. These points may represent the more massive data breaches, which occur here and there, but are not indicative of the more consistent pattern of breaches involving 20,000 records or less.   
 
 #### Mosaic Plot of Region and Breach Type
 
-```{r}
+```{r, fig.height = 10}
+dt.breach_type_region <- dt.data[,list(breach_type_name, region)]
+dt.breach_type_region <- dt.breach_type_region[nchar(region) > 2]
+dt.breach_type_region <- dt.breach_type_region[!region %in% c("Puerto Rico", "Argentina")]
 
-dt.frequency_bar_plot <- dt.data[,list(records_breached, breach_type_name)]
-dt.frequency_bar_plot[,is_records_breached_na := is.na(records_breached)]
-    
-dt.frequency_bar_plot_total <- dt.frequency_bar_plot[,.N, by = list(breach_type_name)]
-colnames(dt.frequency_bar_plot_total) <- c("breach_type_name", "total")
-    
-dt.frequency_bar_plot_count <- dt.frequency_bar_plot[,.N, by = list(breach_type_name, is_records_breached_na)]
+dt.breach_type_count <- dt.breach_type_region[,.N, by = list(region)]
+dt.breach_type_count <- dt.breach_type_count[order(N, decreasing = TRUE)]
 
-dt.frequency_bar_plot_count <- merge(dt.frequency_bar_plot_count, dt.frequency_bar_plot_total, by = c("breach_type_name"))
-dt.frequency_bar_plot_count[,percentage := N / total]
-    
-dt.order.this <- dt.frequency_bar_plot_count[is_records_breached_na == TRUE][order(percentage, decreasing = TRUE)]
-    
-dt.frequency_bar_plot$breach_type_name <- factor(dt.frequency_bar_plot$breach_type_name, 
-                                                     levels = dt.order.this$breach_type_name)
-    
-    
-    
-ggplot(data = dt.frequency_bar_plot) + 
-      geom_mosaic(aes(x = product(is_records_breached_na, breach_type_name), fill = is_records_breached_na)) +
-      scale_fill_brewer(palette = "Set1") + theme_bw(base_size = 15) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+dt.breach_type_region$region <- factor(dt.breach_type_region$region,
+                                       levels = c(dt.breach_type_count$region)) 
 
+
+dt.breach_type_count2 <- dt.breach_type_region[,.N, by = list(breach_type_name)]
+dt.breach_type_count2 <- dt.breach_type_count2[order(N, decreasing = TRUE)]
+
+dt.breach_type_region$breach_type_name <- factor(dt.breach_type_region$breach_type_name,
+                                       levels = c(dt.breach_type_count2$breach_type_name)) 
+
+    
+ggplot(data = dt.breach_type_region) + 
+      geom_mosaic(aes(x = product(breach_type_name, region), fill = region)) +
+      scale_fill_brewer(palette = "Set1") + theme_bw(base_size = 20) + 
+      theme(axis.text.x = element_text(angle = 90, hjust = 0.5, vjust = 0.5)) +
+      ggtitle("Interaction between breach type \nand region") + xlab("Region") + ylab("Breach type")
 ```
 
 We wanted to explore if there was any interaction between the types of breaches and the region. Mosaic plots are great for finding these types of interactions because categories will be much larger or much smaller compared to the other columns if there is interaction. Looking at the chart, there is nothing that immediately jumps out to us. It does not seem that there is any significant interaction between region and breach type. However, we can also see that HACK, DISC, PHYS, PORT are the most common types of data breaches across each of the five regions.
@@ -386,34 +428,78 @@ We wanted to explore if there was any interaction between the types of breaches 
 
 #### Distribution of Records Breached Across States
 
-```{r}
+```{r, fig.height = 12}
 dt.states <- dt.data[nchar(state) > 2][,list(dt, state, records_breached)]
 dt.states <- dt.states[!is.na(records_breached)]
-ggplot(data = dt.states[records_breached < 100000],
+ggplot(data = dt.states[records_breached < 100000 & records_breached > 0],
        aes(x = reorder(state,records_breached,FUN =median), y =records_breached)) + geom_boxplot() + 
   coord_flip() + ggtitle("Distribution of Records Breached Across States") + 
-  ylab("Number of Records Breached") + xlab("") + theme_bw(base_size = 15)
+  ylab("Number of Records Breached") + xlab("") + theme_bw(base_size = 20)
 ```
 
 For this visualization, we faceted the number of records breached by the state in which the breach occurred using boxplots. Once again, we filtered out the 'NA' values and focused on data with less than 100,000 and greater than 0 records breached per breach. Hawaii, Iowa, DC, West VA, and Georgia come out as the top 5 when sorted by median using boxplots. We also noticed that the distribution of data of many categories exhibited large spreads, which may allude to massive data breaches where an alarmingly high number of records were breached per breach. In particular, GA, AZ, and IN stand out as having particularly high variance in the number of records breached. Lastly, we noticed that there may be potential outliers to the right. However, since we subsetted the data earlier to limit it to instances with less than 100,000 number of records breached, we were able to disregard most of the more extreme and skewed values. 
 
-#### Breach source 
+#### Breach type by states
 
 ```{r}
+dt.states <- dt.data[nchar(state) > 2][,list(dt, state, breach_id, breach_type_name)]
+
+dt.map <- dt.states[,.N, by = list(state, breach_type_name)]
+dt.map <- dt.map[state %in% state.name]
+colnames(dt.map) <- c("state", "breach_type_name", "breach_instance")
+
+dt.map_total <- dt.states[,.N, by = list(state)]
+dt.map_total <- dt.map_total[state %in% state.name]
+colnames(dt.map_total) <- c("state", "breach_instance")
+
+dt.map$state <- factor(dt.map$state,levels = dt.map_total[order(breach_instance, decreasing = TRUE)]$state)
+
+dt.map <- dt.map[state %in% head(dt.map_total[order(breach_instance, decreasing = TRUE)]$state, 5)]
+
+ggplot(dt.map, aes(x = state, y = breach_instance, fill = breach_type_name)) + 
+  geom_bar(stat = "identity", position = "dodge") + 
+  theme_bw(base_size = 20) +
+  xlab("State") + ylab("Breach Instance") + scale_fill_colorblind() +
+  ggtitle("Breach type by state")
+```
+
+Next, we further examined which types of breaches are the most prevalent within the top 5 states with the highest number of breaches. We found that amongst the top 5 states, there seemed to be an overarching trend with hacking, unintended disclosure, and physical loss as the major reasons for breaches. Knowing this information, companies in these states can take preventative measures to secure their data against these potential threats. 
+
+#### Breach source 
+
+```{r, fig.height = 10}
 
 dt.breach_source_count <- dt.data[,.N, by = list(breach_source)]
 dt.breach_source_count$breach_source <- factor(dt.breach_source_count$breach_source,
                                                levels = dt.breach_source_count[order(N, decreasing = FALSE)]$breach_source)
 ggplot(dt.breach_source_count, aes(x = breach_source, y = N)) + geom_bar(stat = "identity") + 
-  xlab("Breach Source") + ylab("Frequency of Breach Source") + theme_bw(base_size = 15) + 
+  xlab("Breach Source") + ylab("Frequency of Breach Source") + theme_bw(base_size = 20) + 
   ggtitle("Frequency of Source of Breaches") + coord_flip()
 
 ```
 
 After a major data breach occurs, it is up to companies and organizations to decide which entity they would like to publicize this news. We were interested in seeing which entities tend to be the most frequently chosen. To further examine the source of breaches column, we used data.table to narrow down to only the breach_source column, do a group by on this column, and lastly run a frequency count of the number of instances in which a particular entity/source disseminated this breach information. The US Department of Health and Human Services, Media, California Attorney General, PHIPrivacy.net, and the Maryland Attorney General ranked as the top 5 most frequent sources of breaches. Having a US government entity and Media in the top 5 was somewhat expected because the public does receive a lot of breaking news via media outlets (ie. news, social media, etc.) or press releases from the government. However, we were surprised to see two states' attorney generals in the top 5. Upon further exploratory data analysis of the frequency of occurrence of data breaches across states, our visualizations confirmed that California and Maryland are in first and third place, respectively, for the highest frequency of data breaches. It is interesting that Texas, which was runner up for this data breach frequency across states visualization, and other states with high numbers of breaches did not have their attorney general featured in our breach source analysis. We speculate that there are certain domains that the attorney general of particular states will present on or not take on. Looking at the breach_type that the California and Maryland Attorney General will present on, it seems like they will publicize hack-related data breaches. Furthermore, it is possible that companies will choose to disclose the information through other outlets that may better help to preserve their image in light of massive data breaches. 
 
+#### Breach instances by state population 
 
+```{r}
+# State population data
+dt.states <- dt.data[nchar(state) > 2][,list(dt, state, breach_id)]
+dt.map <- dt.states[,.N, by = state]
+dt.map <- dt.map[state %in% state.name]
+dt.merged_data <- merge(dt.state_population, dt.map, by = c("state"))
+dt.merged_data[,population := population / 1000000]
 
+plt <- ggplot(dt.merged_data, aes(x = population, y = N)) + geom_point() + 
+          xlab("State Population (in millions)") + ylab("Number of Breach Instance") + theme_bw(base_size = 20) +
+          ggtitle("Number of breach instances vs State Population")
 
+plt
+```
 
+We wanted to see if there were any states that had an outsized number of breach attempts. We cannot look at just the net number of attempts because some states will have more companies than others. In order to provide a sense of scale for these metrics, we wanted to look at breach attempts scaled by state population (as a proxy for the number of companies in that state). We used data from the US Census Bureau to get the populations of each state. They are from Q3 of 2017. We plotted number of breach attempts by the population for each state. 
+
+Looking at the relationship between population size and number of breaches, we see a clear positive linear relationship, which is what we would expect to find: as population size increases, the number of breaches increase as well. Other initial findings using time series visualizations also confirmed that the number of breach instances per year increases over time.This aligns with our expectations that as the amount of data being produced increases, entities are at greater risk for a potential compromise with their data. 
+
+Upon examining the data from a regional perspective, we found that Maryland and California both experienced more breaches than expected. A potential reason for these outsized number of breaches for California and Maryland could be because California is a big tech hub with a huge population and Maryland is a big hub for health care technologies, which would lend for increased attempts at data breaching. 
 
