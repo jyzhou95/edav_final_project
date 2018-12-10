@@ -19,7 +19,7 @@ Our ShinyApp is located here: https://jing-yi-zhou.shinyapps.io/shiny_app/
 
 Our Github page is located here: https://github.com/jyzhou95/edav_final_project
 
-OUR Executive summary is located here: 
+OUR Executive summary is located here: https://github.com/jyzhou95/edav_final_project/blob/master/EDAV%20Executive%20Summary.pdf
 
 ### Description of data
 
